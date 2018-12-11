@@ -1,0 +1,3992 @@
+				;file E:\				;1	//products mode:   MW
+				;2	//functional description: 
+				;3	//MCU mode:        HT66F018
+				;4	//MCU frequency:   8MHz
+				;5	//designer:        Lan
+				;6	//data:    2018/7/27 10:58
+				;7	//record:
+				;8	
+				;9	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+				;10	#include "base.h"
+				;11	#define EXTERN
+				;12	#define VAR_DEFINE
+				;13	#include "Var.h"
+				;14	
+				;15	extern unsigned int ntc_val;
+				;16	void Dealy(void)
+				;17	{//				;18		unsigned int i,j;
+				;19		for(i=0;i<50;i++)
+				_Dealy:
+				_Dealy:
+007B	5F6D	clr     i[0]
+007C	5F6E	clr     i[1]
+007D	288F	jmp     _L2
+008C	54ED	inc     i[0]
+008D	3D0A	sz      Z
+008E	54EE	inc     i[1]
+				_L2:
+008F	0F31	mov     a, 31H
+0090	426D	sub     a, i[0]
+0091	0F00	mov     a, 0H
+0092	526E	sbc     a, i[1]
+0093	3C0A	sz      C
+0094	287E	jmp     _L5
+0095	0003	ret
+				;20		{
+				;21			for(j=0;j<50;j++)
+				_L5:
+007E	5F6F	clr     j[0]
+007F	5F70	clr     j[1]
+0080	2886	jmp     _L3
+0083	54EF	inc     j[0]
+0084	3D0A	sz      Z
+0085	54F0	inc     j[1]
+				_L3:
+0086	0F31	mov     a, 31H
+0087	426F	sub     a, j[0]
+0088	0F00	mov     a, 0H
+0089	5270	sbc     a, j[1]
+008A	3C0A	sz      C
+008B	2881	jmp     _L4
+				;22			{
+				;23				 GCC_CLRWDT();
+				_L4:
+0081	0001	clr     wdt
+				;24				_nop();
+0082	0000	nop
+				;25			}
+				;26		}	
+				;27	}
+				;28	//~~~~~~~~~~~~~~~~ 				;29	void SleepMode(void)
+				;30	{
+				;31		_idlen 	= 0;				//   IDLEN 				_SleepMode:
+				_SleepMode:
+0096	348B	clr     IDLEN
+				;32		_wdtc 	= 0b10101000;		// 0097	0FA8	mov     a, A8H
+0098	009A	mov     WDTC, a
+				;33		_lvden 	= 0x00;		  		// 0099	360C	clr     LVDEN
+				;34		GCC_HALT();	
+009A	0002	halt
+009B	0003	ret
+				;35	}
+				;36	
+				;37	void Sleep(void)
+				;38	{
+				;39	//	u8 i = 0;	
+				;40	//	for(i=0;i<8;i++)		//				;41	//		LEDSta[i] = 0;
+				;42	//	IOReset();
+				;43		_adoff = true;
+				_Sleep:
+				_Sleep:
+009C	32A2	set     ADOFF
+				;44		Dealy();
+009D	207B	call    _Dealy
+				;45		do
+				;46		{
+				;47			_emi = 0;		
+009E	340E	clr     EMI
+				;48			SleepMode();		//009F	2096	call    _SleepMode
+				;49			_emi = 1;
+00A0	300E	set     EMI
+				;50			break;		
+				;51		}while(1);
+				;52	
+				;53		_adoff = false;
+00A1	36A2	clr     ADOFF
+00A2	0003	ret
+				;54	}
+				;55	
+				;56	/********************************************************/
+				;57	void main(void)
+				;58	{	
+				@code .SECTION 'CODE'
+				include HT66F018.inc
+0000	2814	jmp     begin_startup_value
+				startupend3:
+				@start .SECTION 'CODE'
+004E	28A3	jmp     _main
+				startup_value:
+				@ROMDATA_BASE .SECTION 'CODE'
+004F	000F	jmp     L000F
+0050	00B7	mov     TM1C1, a
+				@ROMDATA_BASE .SECTION 'CODE'
+				@ROMDATA_BASE .SECTION 'CODE'
+				@ROMDATA_BASE .SECTION 'CODE'
+				@ROMDATA_BASE .SECTION 'CODE'
+				@ROMDATA_BASE .SECTION 'CODE'
+				@ROMDATA_BASE .SECTION 'CODE'
+				@ROMDATA_BASE .SECTION 'CODE'
+				@ROMDATA_BASE .SECTION 'CODE'
+				@ROMDATA_BASE .SECTION 'CODE'
+				@ROMDATA_BASE .SECTION 'CODE'
+				@ROMDATA_BASE .SECTION 'CODE'
+				@ROMDATA_BASE .SECTION 'CODE'
+				@ROMDATA_BASE .SECTION 'CODE'
+				@ROMDATA_BASE .SECTION 'CODE'
+0051	0000	nop
+0052	0000	nop
+0053	0000	nop
+0054	0A00	sub     a, 0H
+				;59	    InitSys();					//				_main:
+				_main:
+00A3	20B9	call    _InitSys
+				;60	    Ram_Init();
+00A4	20F4	call    _Ram_Init
+				;61	    Timer_Init();				//00A5	21B0	call    _Timer_Init
+				;62	    while(1)
+				;63	    {
+				;64			GCC_CLRWDT();			//				_L11:
+00A6	0001	clr     wdt
+				;65			GetPTCValu();	     	//00A7	25DB	call    _GetPTCValu
+				;66			Get_Battery_Valu();		//00A8	27A6	call    _Get_Battery_Valu
+				;67			GetKey();				//00A9	234C	call    _GetKey
+				;68			Run_Operation();		//
+00AA	60F4	call    _Run_Operation
+				;69			Battery_Status_Operation();
+00AB	2001	call    _Battery_Status_Operation
+				;70			TaskBuzzer();     
+00AC	253A	call    _TaskBuzzer
+				;71			if(DCInFlag)			//00AD	4721	mov     a, maiFlagB[0]
+00AE	40D5	mov     ra, a
+00AF	0F40	mov     a, 40H
+00B0	46D5	andm    a, ra
+00B1	50D5	sz      ra
+00B2	28B4	jmp     _LI1
+00B3	28B6	jmp     _L9
+				;72			{			
+				;73				Breathe_Flag = 1;
+				_LI1:
+00B4	7022	set     LEDG[0].0
+				;74			}
+				;75			else 
+				;76			{
+				;77				Breathe_Flag = 0;
+				_L9:
+00B6	7422	clr     LEDG[0].0
+				;78			}
+				;79	    }
+00B5	28A6	jmp     _L11
+00B7	28A6	jmp     _L11
+00B8	28B8	jmp     $
+				;80	}
+				;file E:\				;1	#include "base.h"
+				;2	#define EXTERN extern
+				;3	#include "Var.h"
+				;4	
+				;5	extern unsigned char Time_5S_Cnt;
+				;6	extern unsigned char Time_500MS_Cnt;
+				;7	extern unsigned char Time_1Min_Cnt;
+				;8	extern u16 Tim2_wave_delay;
+				;9	u8 Eletricize_Mode = 0;
+				;10	//				;11	//0.1				;12	
+				;13	/*u8 gaodi_bit=0;	//				;14	//u8 gaodi_number=0;		//				;15	u8 signal_hz_1s = 2;		//				;16	volatile static unsigned char gaodi_number __attribute__ ((at(0x1a3)));
+				;17	
+				;18	
+				;19	void Battery_Status_Operation(void)
+				;20	{
+				_Battery_Status_Operation:
+				_Battery_Status_Operation:
+0001	0003	ret
+0002	0000	nop
+0003	0000	nop
+				;21	//	if(signal_hz_1s)   
+				;22	//		Eletricize_Mode = 1;	
+				;23	//	else	 
+				;24	//		Eletricize_Mode = 2;
+				;25	///***************************************************************************/	
+				;26	//	switch(Eletricize_Mode)
+				;27	//	{
+				;28	//		case 1:		//**********  				;29	////			Breathe_Flag = 1;	// 				;30	////			LED_3_BLU_OFF;
+				;31	////			LED_3_GREEN_OFF;
+				;32	////			LED_3_RED_OFF;
+				;33	////			MOTOR_OFF;
+				;34	////			Heat_Wire_OFF;
+				;35	//			break;
+				;36	//			
+				;37	//		case 2:		//*********** 				;38	////			LED_Breathe_light_ON;      //  				;39	////			Breathe_Flag = 0;
+				;40	//			break;
+				;41	//		
+				;42	//		case 3:		//*********** 				;43	//			if(Time_5S_Cnt <= 5)		
+				;44	//			{					
+				;45	//				KeyBuzzer(4);	// 				;46	//				if(Time_500MS_Cnt >= 5)		// 				;47	//				{
+				;48	//					LED_Breathe_light_REVERSE;
+				;49	//					if(Time_500MS_Cnt == 5) 
+				;50	//					{
+				;51	//						Time_500MS_Cnt = 0;
+				;52	//						LED_Breathe_light_OFF;
+				;53	//					}
+				;54	//				}
+				;55	//			}
+				;56	//			else 
+				;57	//			{
+				;58	//				Time_5S_Cnt = 0;
+				;59	//				Power_Low_33V_Flag = 0;	
+				;60	//			}
+				;61	//			if(Time_1Min_Cnt >= 60)    //   1				;62	//			{
+				;63	//				Time_1Min_Cnt = 0;
+				;64	//				Sleep_Mode();
+				;65	//			}
+				;66	//			break;
+				;67	//		
+				;68	//		default:
+				;69	////			LED_Breathe_light_OFF;
+				;70	//			break;
+				;71	//	}
+				;72	}
+				;file E:\				;1	#include "base.h"
+				;2	#define EXTERN extern
+				;3	#include "Var.h"
+				;4	
+				;5	#define INIT_NO_DETECT_TIME	3
+				;6	volatile static unsigned char Time4mSCnt __attribute__ ((at(0x1d5)));
+				;7	//volatile static unsigned char Time1SCnt __attribute__ ((at(0x1d6)));
+				;8	volatile static unsigned char Time1SClearCnt __attribute__ ((at(0x1d7)));
+				;9	volatile static unsigned char Time_3S_Cnt __attribute__ ((at(0x1d8)));
+				;10	volatile static unsigned char Time_10Min_Cnt __attribute__ ((at(0x1d9)));
+				;11	volatile static unsigned char Time_30Min_Cnt __attribute__ ((at(0x1da)));
+				;12	
+				;13	unsigned char Time500mSCnt = 0;
+				;14	unsigned char Time_5S_Cnt = 0;
+				;15	unsigned char TimeMinCnt = 0;
+				;16	
+				;17	/********************************************************/
+				;18	volatile unsigned int PWMCnt = 0;
+				;19	volatile unsigned int HuxiCnt = 0;
+				;20	volatile unsigned int PWMValu = 10;
+0055	0000	nop
+0056	0000	nop
+0057	0000	nop
+0058	0000	nop
+0059	0003	ret
+005A	00CB	mov     __pcpu[9], a
+				@ROMDATA_BASE .SECTION 'CODE'
+				@ROMDATA_BASE .SECTION 'CODE'
+				@ROMDATA_BASE .SECTION 'CODE'
+005B	0000	nop
+005C	000F	dc	0000FH
+005D	0002	halt
+005E	00D2	mov     __pcpu[16], a
+				@ROMDATA_BASE .SECTION 'CODE'
+				@ROMDATA_BASE .SECTION 'CODE'
+005F	0200	sub     a, [00H]
+0060	0000	nop
+				;21	
+				;22	#define HUXI_VAL 1300
+				;23	
+				;24	/***************** 				;25	void LED_Breathe(void)
+				;26	{
+				;27		if((Breathe_Flag == 1))
+				_LED_Breathe:
+				_LED_Breathe:
+0114	4722	mov     a, LEDG[0]
+0115	40D9	mov     ra10, a
+0116	0F01	mov     a, 1H
+0117	46D9	andm    a, ra10
+0118	50D9	sz      ra10
+0119	291B	jmp     _LI1
+011A	29A0	jmp     _L2
+				;28		{
+				;29		    PWMCnt++;
+				_LI1:
+011B	473A	mov     a, PWMCnt[0]
+011C	40D9	mov     ra10, a
+011D	473B	mov     a, PWMCnt[1]
+011E	40DA	mov     rb10, a
+011F	54D9	inc     ra10
+0120	3D0A	sz      Z
+0121	54DA	inc     rb10
+0122	4759	mov     a, ra10
+0123	40BA	mov     PWMCnt[0], a
+0124	475A	mov     a, rb10
+0125	40BB	mov     PWMCnt[1], a
+				;30		    HuxiCnt++;
+0126	473C	mov     a, HuxiCnt[0]
+0127	40D9	mov     ra10, a
+0128	473D	mov     a, HuxiCnt[1]
+0129	40DA	mov     rb10, a
+012A	54D9	inc     ra10
+012B	3D0A	sz      Z
+012C	54DA	inc     rb10
+012D	4759	mov     a, ra10
+012E	40BC	mov     HuxiCnt[0], a
+012F	475A	mov     a, rb10
+0130	40BD	mov     HuxiCnt[1], a
+				;31		    if(PWMCnt == PWMValu)      //0131	473A	mov     a, PWMCnt[0]
+0132	40DB	mov     rc10, a
+0133	473B	mov     a, PWMCnt[1]
+0134	40DC	mov     rd10, a
+0135	473E	mov     a, PWMValu[0]
+0136	40D9	mov     ra10, a
+0137	473F	mov     a, PWMValu[1]
+0138	40DA	mov     rb10, a
+0139	475B	mov     a, rc10
+013A	4459	xor     a, ra10
+013B	475C	mov     a, rd10
+013C	3D0A	sz      Z
+013D	445A	xor     a, rb10
+013E	390A	snz     Z
+013F	2941	jmp     _L3
+				;32		    {
+				;33		        LED_Breathe_ON;       	//0140	3794	clr     PA7
+				;34		    }
+				;35		    if(PWMCnt == 10)             //				_L3:
+0141	473A	mov     a, PWMCnt[0]
+0142	40D9	mov     ra10, a
+0143	473B	mov     a, PWMCnt[1]
+0144	40DA	mov     rb10, a
+0145	4759	mov     a, ra10
+0146	0C0A	xor     a, AH
+0147	455A	or      a, rb10
+0148	390A	snz     Z
+0149	294D	jmp     _L4
+				;36		    {
+				;37		        LED_Breathe_OFF;      	//014A	3394	set     PA7
+				;38		        PWMCnt = 0;              //014B	5F3A	clr     PWMCnt[0]
+014C	5F3B	clr     PWMCnt[1]
+				;39		    }
+				;40		    if((HuxiCnt == HUXI_VAL) && (direc_flag == 0))
+				_L4:
+014D	473C	mov     a, HuxiCnt[0]
+014E	40D9	mov     ra10, a
+014F	473D	mov     a, HuxiCnt[1]
+0150	40DA	mov     rb10, a
+0151	4759	mov     a, ra10
+0152	0C14	xor     a, 14H
+0153	475A	mov     a, rb10
+0154	3D0A	sz      Z
+0155	0C05	xor     a, 5H
+0156	390A	snz     Z
+0157	2975	jmp     _L5
+0158	4720	mov     a, maiFlagA[0]
+0159	40D9	mov     ra10, a
+015A	0F40	mov     a, 40H
+015B	46D9	andm    a, ra10
+015C	50D9	sz      ra10
+015D	2975	jmp     _L5
+				;41		    {                               //				;42		        HuxiCnt = 0;
+015E	5F3C	clr     HuxiCnt[0]
+015F	5F3D	clr     HuxiCnt[1]
+				;43		        PWMValu++;
+0160	473E	mov     a, PWMValu[0]
+0161	40D9	mov     ra10, a
+0162	473F	mov     a, PWMValu[1]
+0163	40DA	mov     rb10, a
+0164	54D9	inc     ra10
+0165	3D0A	sz      Z
+0166	54DA	inc     rb10
+0167	4759	mov     a, ra10
+0168	40BE	mov     PWMValu[0], a
+0169	475A	mov     a, rb10
+016A	40BF	mov     PWMValu[1], a
+				;44		        if(PWMValu == 10)          //016B	473E	mov     a, PWMValu[0]
+016C	40D9	mov     ra10, a
+016D	473F	mov     a, PWMValu[1]
+016E	40DA	mov     rb10, a
+016F	4759	mov     a, ra10
+0170	0C0A	xor     a, AH
+0171	455A	or      a, rb10
+0172	390A	snz     Z
+0173	2975	jmp     _L5
+				;45		            direc_flag = 1; 
+0174	7320	set     maiFlagA[0].6
+				;46		    }
+				;47	 	    if((HuxiCnt == HUXI_VAL) && (direc_flag == 1))
+				_L5:
+0175	473C	mov     a, HuxiCnt[0]
+0176	40D9	mov     ra10, a
+0177	473D	mov     a, HuxiCnt[1]
+0178	40DA	mov     rb10, a
+0179	4759	mov     a, ra10
+017A	0C14	xor     a, 14H
+017B	475A	mov     a, rb10
+017C	3D0A	sz      Z
+017D	0C05	xor     a, 5H
+017E	390A	snz     Z
+017F	29A1	jmp     _L1
+0180	4720	mov     a, maiFlagA[0]
+0181	40D9	mov     ra10, a
+0182	0F40	mov     a, 40H
+0183	46D9	andm    a, ra10
+0184	50D9	sz      ra10
+0185	2987	jmp     _LI2
+0186	29A1	jmp     _L1
+				;48		    {                               //				;49		        HuxiCnt = 0;
+				_LI2:
+0187	5F3C	clr     HuxiCnt[0]
+0188	5F3D	clr     HuxiCnt[1]
+				;50		        PWMValu--;
+0189	473E	mov     a, PWMValu[0]
+018A	40D9	mov     ra10, a
+018B	473F	mov     a, PWMValu[1]
+018C	40DA	mov     rb10, a
+018D	0FFF	mov     a, FFH
+018E	43D9	addm    a, ra10
+018F	0FFF	mov     a, FFH
+0190	53DA	adcm    a, rb10
+0191	4759	mov     a, ra10
+0192	40BE	mov     PWMValu[0], a
+0193	475A	mov     a, rb10
+0194	40BF	mov     PWMValu[1], a
+				;51		        if(PWMValu == 1)          //0195	473E	mov     a, PWMValu[0]
+0196	40D9	mov     ra10, a
+0197	473F	mov     a, PWMValu[1]
+0198	40DA	mov     rb10, a
+0199	4759	mov     a, ra10
+019A	0C01	xor     a, 1H
+019B	455A	or      a, rb10
+019C	390A	snz     Z
+019D	29A1	jmp     _L1
+				;52		            direc_flag = 0; 
+019E	7720	clr     maiFlagA[0].6
+019F	29A1	jmp     _L1
+				;53		    } 	
+				;54		}
+				;55		else 
+				;56		{
+				;57			LED_Breathe_OFF;
+				_L2:
+01A0	3394	set     PA7
+				_L1:
+01A1	0003	ret
+				;58		}	
+				;59	}
+				;60	
+				;61	/*****************************************************************/
+				;62	extern unsigned int ntc_val;		
+				;63	//				;64	void Heat_Wire_Duty(u16 step_15)
+				;65	{	
+				;66		_tm0al = ((step_15&0xff));
+				_Heat_Wire_Duty:
+				_Heat_Wire_Duty:
+01A2	476D	mov     a, step_15[0]
+01A3	40D5	mov     ra, a
+01A4	4755	mov     a, ra
+01A5	00B3	mov     TM0AL, a
+				;67		_tm0ah = ((step_15>>8));	
+01A6	476D	mov     a, step_15[0]
+01A7	40D5	mov     ra, a
+01A8	476E	mov     a, step_15[1]
+01A9	40D6	mov     rb, a
+01AA	4756	mov     a, rb
+01AB	40D5	mov     ra, a
+01AC	5F56	clr     rb
+01AD	4755	mov     a, ra
+01AE	00B4	mov     TM0AH, a
+01AF	0003	ret
+				;68	}
+				;69	/*********************************************************/
+				;70	void Timer_Init(void)
+				;71	{               
+				;72	//time0 PWM
+				;73		_wdtc = 0xA8;  	
+				_Timer_Init:
+				_Timer_Init:
+01B0	0FA8	mov     a, A8H
+01B1	009A	mov     WDTC, a
+				;74		_pac0 = 0;//PA0 output--PWM01B2	3415	clr     PAC0
+				;75		_t0cp = 1;//TP0(PA0)01B3	3019	set     T0CP
+				;76	
+				;77		//				;78	//	_smod = 0x01;//fsys = fH   bit0 = 1
+				;79		
+				;80		//-------STM init-------
+				;81		//				;82		_tm0al = 0x00;//01B4	1F33	clr     TM0AL
+				;83		_tm0ah = 0x00;//01B5	1F34	clr     TM0AH
+				;84		_tm0dl = 0x00;
+01B6	1F31	clr     TM0DL
+				;85		_tm0dh = 0x00; 
+01B7	1F32	clr     TM0DH
+				;86		_tm0rp = 0x08;//01B8	0F08	mov     a, 8H
+01B9	00B5	mov     TM0RP, a
+				;87		_tm0c1 = 0xA4;//01BA	0FA4	mov     a, A4H
+01BB	00B0	mov     TM0C1, a
+				;88		_tm0c0 = 0x28;//01BC	0F28	mov     a, 28H
+01BD	00AF	mov     TM0C0, a
+				;89	/*********************  TM_2 INIT ******************************************************/
+				;90		_t2cp = 0;
+01BE	3519	clr     T2CP
+				;91		_tm2al = 0xc8;     //  03e8  500us  07d0 = 1ms   c8 = 100us
+01BF	0FC8	mov     a, C8H
+01C0	00AC	mov     TM2AL, a
+				;92		_tm2ah = 0x00;
+01C1	1F2D	clr     TM2AH
+				;93		_tm2rp = 0xff;
+01C2	1FAE	set     TM2RP
+				;94	
+				;95		_tm2c1 = 0b11000001;     // 01C3	0FC1	mov     a, C1H
+01C4	00A9	mov     TM2C1, a
+				;96		_tm2c0 = 0b00001000;		// Tm2 01C5	0F08	mov     a, 8H
+01C6	00A8	mov     TM2C0, a
+				;97		
+				;98		_t2af = 1;		// 01C7	3392	set     T2AF
+				;99		_t2ae = 1;		// a 01C8	3192	set     T2AE
+				;100		_mf2e = 0;		//01C9	348F	clr     MF2E
+				;101		
+				;102		_mf1f = 1;
+01CA	320F	set     MF1F
+				;103		_mf1e = 1;
+01CB	300F	set     MF1E
+				;104			
+				;105	/**************					;106		_int0s0 = 1;_int0s1 = 1;			// 10 01CC	300D	set     INT0S0
+01CD	308D	set     INT0S1
+				;107	    _int0e = true;  
+01CE	308E	set     INT0E
+				;108		_emi = 1;      
+01CF	300E	set     EMI
+				;109		Time1SClearCnt = 0;      
+01D0	0FD7	mov     a, D7H
+01D1	0083	mov     MP1, a
+01D2	0F01	mov     a, 1H
+01D3	0081	mov     MP0, a
+01D4	0701	mov     a, MP0
+01D5	0084	mov     BP, a
+01D6	0F00	mov     a, 0H
+01D7	0082	mov     [02H], a
+01D8	0003	ret
+				;110	}
+				;111	
+				;112	/*********************************************************************************************************
+				;113	** 				;114	** 				;115	** 				;116	** 				;117	** 				;118	** 				;119	********************************************************************************************************/
+				;120	u16 Time100uSCnt = 0;
+				;121	u16 ChargPlusDly = 0;
+				;122	u8 LEDSta[4];
+				;123	/**********************************************************
+				;124	
+				;125	 * 				;126	 * 				;127	 * 				;128	 * 				;129	 * 				;130	 **********************************************************/
+				;131	unsigned char scan_num = 0;//				;132	u8 IntCnt = 0;
+				;133	void LEDDispKeyScan(void)
+				;134	{
+				;135		scan_num++;	
+				_LEDDispKeyScan:
+				_LEDDispKeyScan:
+01D9	4744	mov     a, scan_num[0]
+01DA	40D9	mov     ra10, a
+01DB	54D9	inc     ra10
+01DC	4759	mov     a, ra10
+01DD	40C4	mov     scan_num[0], a
+				;136	
+				;137		switch(scan_num)	
+01DE	4744	mov     a, scan_num[0]
+01DF	40D9	mov     ra10, a
+01E0	5F5A	clr     rb10
+01E1	4759	mov     a, ra10
+01E2	0C01	xor     a, 1H
+01E3	455A	or      a, rb10
+01E4	3D0A	sz      Z
+01E5	29F6	jmp     _L12
+01E6	4759	mov     a, ra10
+01E7	0C02	xor     a, 2H
+01E8	455A	or      a, rb10
+01E9	3D0A	sz      Z
+01EA	2A04	jmp     _L13
+01EB	4759	mov     a, ra10
+01EC	0C03	xor     a, 3H
+01ED	455A	or      a, rb10
+01EE	3D0A	sz      Z
+01EF	2A12	jmp     _L14
+01F0	4759	mov     a, ra10
+01F1	0C04	xor     a, 4H
+01F2	455A	or      a, rb10
+01F3	3D0A	sz      Z
+01F4	2A20	jmp     _L15
+				;138		{
+				;139			case 1://				;140				if(LEDSta[0] == 1)
+				_L12:
+01F6	4746	mov     a, LEDSta[0]
+01F7	40D9	mov     ra10, a
+01F8	5759	sdza    ra10
+01F9	2A03	jmp     _L16
+				;141				{
+				;142					COM3_INPUT;
+01FA	3395	set     PAC7
+01FB	3796	clr     PAPU7
+				;143					COM1_OFF;
+01FC	3440	clr     PC0
+				;144					COM2_ON;				
+01FD	3114	set     PA2
+				;145					COM1_OUTPUT;
+01FE	3441	clr     PCC0
+01FF	3042	set     PCPU0
+				;146					COM2_OUTPUT;
+0200	3515	clr     PAC2
+0201	3116	set     PAPU2
+				;147				}
+				;148				break;
+0202	2A2D	jmp     _L10
+				_L16:
+0203	2A2D	jmp     _L10
+				;149			case 2:
+				;150				if(LEDSta[1] == 1)
+				_L13:
+0204	4747	mov     a, LEDSta[1]
+0205	40D9	mov     ra10, a
+0206	5759	sdza    ra10
+0207	2A11	jmp     _L18
+				;151				{				
+				;152					COM3_INPUT;
+0208	3395	set     PAC7
+0209	3796	clr     PAPU7
+				;153					COM1_ON;
+020A	3040	set     PC0
+				;154					COM2_OFF;
+020B	3514	clr     PA2
+				;155					COM1_OUTPUT;
+020C	3441	clr     PCC0
+020D	3042	set     PCPU0
+				;156					COM2_OUTPUT;
+020E	3515	clr     PAC2
+020F	3116	set     PAPU2
+				;157				}
+				;158				break;
+0210	2A2D	jmp     _L10
+				_L18:
+0211	2A2D	jmp     _L10
+				;159			case 3:	
+				;160				if(LEDSta[2] == 1)
+				_L14:
+0212	4748	mov     a, LEDSta[2]
+0213	40D9	mov     ra10, a
+0214	5759	sdza    ra10
+0215	2A1F	jmp     _L19
+				;161				{
+				;162					COM1_INPUT;
+0216	3041	set     PCC0
+0217	3442	clr     PCPU0
+				;163					COM2_ON;
+0218	3114	set     PA2
+				;164					COM3_OFF;
+0219	3794	clr     PA7
+				;165					COM2_OUTPUT;
+021A	3515	clr     PAC2
+021B	3116	set     PAPU2
+				;166					COM3_OUTPUT;
+021C	3795	clr     PAC7
+021D	3396	set     PAPU7
+				;167				}
+				;168				break;
+021E	2A2D	jmp     _L10
+				_L19:
+021F	2A2D	jmp     _L10
+				;169	      	case 4:
+				;170				if(LEDSta[3] == 1)
+				_L15:
+0220	4749	mov     a, LEDSta[3]
+0221	40D9	mov     ra10, a
+0222	5759	sdza    ra10
+0223	2A2C	jmp     _L20
+				;171				{
+				;172					COM1_INPUT;
+0224	3041	set     PCC0
+0225	3442	clr     PCPU0
+				;173					COM2_OFF;
+0226	3514	clr     PA2
+				;174					COM3_ON;
+0227	3394	set     PA7
+				;175					COM2_OUTPUT;
+0228	3515	clr     PAC2
+0229	3116	set     PAPU2
+				;176					COM3_OUTPUT;
+022A	3795	clr     PAC7
+022B	3396	set     PAPU7
+				;177				}
+				;178	 			scan_num = 0;
+				_L20:
+022C	5F44	clr     scan_num[0]
+				;179		      	break;
+				_L10:
+022D	0003	ret
+				;180	      default:
+				;181		      break;
+01F5	2A2D	jmp     _L10
+				;182	   }
+				;183	}
+				;184	
+				;185	#define CNT_4MS		40 	//4ms
+				;186	#define CNT_1S		250	//1s
+				;187	#define PRE_HEAT	10
+				;188	void __attribute((interrupt(0x10))) ISR_tmr2 (void)
+				;189	{
+				@dummy12 .SECTION 'CODE'
+				@ISR_tmr2_code .SECTION 'CODE'
+0010	40DD	mov     r110, a
+0011	0704	mov     a, BP
+0012	40DE	mov     r210, a
+0013	2A2E	jmp     _ISR_tmr2
+				_ISR_tmr2:
+				_ISR_tmr2:
+022E	070A	mov     a, STATUS
+022F	40DF	mov     r310, a
+0230	0703	mov     a, MP1
+0231	40E0	mov     r410, a
+0232	0701	mov     a, MP0
+0233	40E1	mov     r510, a
+0234	0707	mov     a, TBLP
+0235	40E2	mov     r610, a
+0236	0709	mov     a, TBHP
+0237	40E3	mov     r710, a
+				;190		static u8 i =0;
+				;191		_t2af = 0;
+0238	3792	clr     T2AF
+				;192		Time100uSCnt++;	
+0239	4740	mov     a, Time100uSCnt[0]
+023A	40D9	mov     ra10, a
+023B	4741	mov     a, Time100uSCnt[1]
+023C	40DA	mov     rb10, a
+023D	54D9	inc     ra10
+023E	3D0A	sz      Z
+023F	54DA	inc     rb10
+0240	4759	mov     a, ra10
+0241	40C0	mov     Time100uSCnt[0], a
+0242	475A	mov     a, rb10
+0243	40C1	mov     Time100uSCnt[1], a
+				;193		LED_Breathe();		//0244	2114	call    _LED_Breathe
+				;194		if(Time100uSCnt >= CNT_4MS)	//4ms
+0245	4740	mov     a, Time100uSCnt[0]
+0246	40D9	mov     ra10, a
+0247	4741	mov     a, Time100uSCnt[1]
+0248	40DA	mov     rb10, a
+0249	0F27	mov     a, 27H
+024A	4259	sub     a, ra10
+024B	0F00	mov     a, 0H
+024C	525A	sbc     a, rb10
+024D	3C0A	sz      C
+024E	2AFA	jmp     _L21
+				;195		{
+				;196			Time100uSCnt = 0;
+024F	5F40	clr     Time100uSCnt[0]
+0250	5F41	clr     Time100uSCnt[1]
+				;197			TaskBuzzerRdy  = true;
+0251	71A2	set     LEDG[0].3
+				;198			ChargPlusDly++;
+0252	4742	mov     a, ChargPlusDly[0]
+0253	40D9	mov     ra10, a
+0254	4743	mov     a, ChargPlusDly[1]
+0255	40DA	mov     rb10, a
+0256	54D9	inc     ra10
+0257	3D0A	sz      Z
+0258	54DA	inc     rb10
+0259	4759	mov     a, ra10
+025A	40C2	mov     ChargPlusDly[0], a
+025B	475A	mov     a, rb10
+025C	40C3	mov     ChargPlusDly[1], a
+				;199			Time4mSCnt++;
+025D	0FD5	mov     a, D5H
+025E	0083	mov     MP1, a
+025F	0F01	mov     a, 1H
+0260	0081	mov     MP0, a
+0261	0701	mov     a, MP0
+0262	0084	mov     BP, a
+0263	0702	mov     a, [02H]
+0264	40D9	mov     ra10, a
+0265	54D9	inc     ra10
+0266	0FD5	mov     a, D5H
+0267	0083	mov     MP1, a
+0268	0F01	mov     a, 1H
+0269	0081	mov     MP0, a
+026A	0701	mov     a, MP0
+026B	0084	mov     BP, a
+026C	4759	mov     a, ra10
+026D	0082	mov     [02H], a
+				;200			if((Time4mSCnt & 0x02) == 0x02)	//026E	0FD5	mov     a, D5H
+026F	0083	mov     MP1, a
+0270	0F01	mov     a, 1H
+0271	0081	mov     MP0, a
+0272	0701	mov     a, MP0
+0273	0084	mov     BP, a
+0274	0702	mov     a, [02H]
+0275	40D9	mov     ra10, a
+0276	5F5A	clr     rb10
+0277	0F02	mov     a, 2H
+0278	46D9	andm    a, ra10
+0279	0F00	mov     a, 0H
+027A	46DA	andm    a, rb10
+027B	4759	mov     a, ra10
+027C	455A	or      a, rb10
+027D	3D0A	sz      Z
+027E	2A80	jmp     _L23
+				;201				TaskKeyRdy = true;
+027F	72A2	set     LEDG[0].5
+				;202			LEDDispKeyScan();
+				_L23:
+0280	21D9	call    _LEDDispKeyScan
+				;203			Open5V200msCnt++;
+0281	4733	mov     a, Open5V200msCnt[0]
+0282	40D9	mov     ra10, a
+0283	4734	mov     a, Open5V200msCnt[1]
+0284	40DA	mov     rb10, a
+0285	54D9	inc     ra10
+0286	3D0A	sz      Z
+0287	54DA	inc     rb10
+0288	4759	mov     a, ra10
+0289	40B3	mov     Open5V200msCnt[0], a
+028A	475A	mov     a, rb10
+028B	40B4	mov     Open5V200msCnt[1], a
+				;204			Time500mSCnt++;		
+028C	4737	mov     a, Time500mSCnt[0]
+028D	40D9	mov     ra10, a
+028E	54D9	inc     ra10
+028F	4759	mov     a, ra10
+0290	40B7	mov     Time500mSCnt[0], a
+				;205			if(Time4mSCnt >= CNT_1S)		//1s
+0291	0FD5	mov     a, D5H
+0292	0083	mov     MP1, a
+0293	0F01	mov     a, 1H
+0294	0081	mov     MP0, a
+0295	0701	mov     a, MP0
+0296	0084	mov     BP, a
+0297	0702	mov     a, [02H]
+0298	40D9	mov     ra10, a
+0299	0FF9	mov     a, F9H
+029A	4259	sub     a, ra10
+029B	3C0A	sz      C
+029C	2AC9	jmp     _L24
+				;206			{
+				;207				Time4mSCnt = 0;
+029D	0FD5	mov     a, D5H
+029E	0083	mov     MP1, a
+029F	0F01	mov     a, 1H
+02A0	0081	mov     MP0, a
+02A1	0701	mov     a, MP0
+02A2	0084	mov     BP, a
+02A3	0F00	mov     a, 0H
+02A4	0082	mov     [02H], a
+				;208				Time1SCnt++;
+02A5	4735	mov     a, Time1SCnt[0]
+02A6	40D9	mov     ra10, a
+02A7	54D9	inc     ra10
+02A8	4759	mov     a, ra10
+02A9	40B5	mov     Time1SCnt[0], a
+				;209				Time1SClearCnt++;
+02AA	0FD7	mov     a, D7H
+02AB	0083	mov     MP1, a
+02AC	0F01	mov     a, 1H
+02AD	0081	mov     MP0, a
+02AE	0701	mov     a, MP0
+02AF	0084	mov     BP, a
+02B0	0702	mov     a, [02H]
+02B1	40D9	mov     ra10, a
+02B2	54D9	inc     ra10
+02B3	0FD7	mov     a, D7H
+02B4	0083	mov     MP1, a
+02B5	0F01	mov     a, 1H
+02B6	0081	mov     MP0, a
+02B7	0701	mov     a, MP0
+02B8	0084	mov     BP, a
+02B9	4759	mov     a, ra10
+02BA	0082	mov     [02H], a
+				;210				SumOfEdge++;
+02BB	4736	mov     a, SumOfEdge[0]
+02BC	40D9	mov     ra10, a
+02BD	54D9	inc     ra10
+02BE	4759	mov     a, ra10
+02BF	40B6	mov     SumOfEdge[0], a
+				;211				if(WorkMode == READY_MODE)	//02C0	472F	mov     a, WorkMode[0]
+02C1	40D9	mov     ra10, a
+02C2	50D9	sz      ra10
+02C3	2AC9	jmp     _L24
+				;212				{
+				;213					SleepCnt++;
+02C4	4724	mov     a, SleepCnt[0]
+02C5	40D9	mov     ra10, a
+02C6	54D9	inc     ra10
+02C7	4759	mov     a, ra10
+02C8	40A4	mov     SleepCnt[0], a
+				;214				}
+				;215			}
+				;216			if(Time500mSCnt >= 125)			//500ms
+				_L24:
+02C9	4737	mov     a, Time500mSCnt[0]
+02CA	40D9	mov     ra10, a
+02CB	0F7C	mov     a, 7CH
+02CC	4259	sub     a, ra10
+02CD	3C0A	sz      C
+02CE	2AD1	jmp     _L25
+				;217			{			
+				;218				Task500msFlag = true;
+02CF	70A3	set     LEDH[0].1
+				;219				Time500mSCnt = 0;
+02D0	5F37	clr     Time500mSCnt[0]
+				;220			}
+				;221			if(Time1SClearCnt >= 5)			//5S				_L25:
+02D1	0FD7	mov     a, D7H
+02D2	0083	mov     MP1, a
+02D3	0F01	mov     a, 1H
+02D4	0081	mov     MP0, a
+02D5	0701	mov     a, MP0
+02D6	0084	mov     BP, a
+02D7	0702	mov     a, [02H]
+02D8	40D9	mov     ra10, a
+02D9	0F04	mov     a, 4H
+02DA	4259	sub     a, ra10
+02DB	3C0A	sz      C
+02DC	2AE7	jmp     _L26
+				;222			{
+				;223				Time1SClearCnt = 0;
+02DD	0FD7	mov     a, D7H
+02DE	0083	mov     MP1, a
+02DF	0F01	mov     a, 1H
+02E0	0081	mov     MP0, a
+02E1	0701	mov     a, MP0
+02E2	0084	mov     BP, a
+02E3	0F00	mov     a, 0H
+02E4	0082	mov     [02H], a
+				;224				IntCnt = 0;
+02E5	5F45	clr     IntCnt[0]
+				;225				DCInFlag = false;
+02E6	7721	clr     maiFlagB[0].6
+				;226			}
+				;227			if(Time1SCnt >= PRE_HEAT)		//1min
+				_L26:
+02E7	4735	mov     a, Time1SCnt[0]
+02E8	40D9	mov     ra10, a
+02E9	0F09	mov     a, 9H
+02EA	4259	sub     a, ra10
+02EB	3C0A	sz      C
+02EC	2AFA	jmp     _L21
+				;228			{
+				;229				if(PreHeatFlag)	
+02ED	4720	mov     a, maiFlagA[0]
+02EE	40D9	mov     ra10, a
+02EF	0F01	mov     a, 1H
+02F0	46D9	andm    a, ra10
+02F1	50D9	sz      ra10
+02F2	2AF4	jmp     _LI3
+02F3	2AF5	jmp     _L27
+				;230					PreHeatFlag = false;
+				_LI3:
+02F4	7420	clr     maiFlagA[0].0
+				;231				TimeMinCnt++;
+				_L27:
+02F5	4739	mov     a, TimeMinCnt[0]
+02F6	40D9	mov     ra10, a
+02F7	54D9	inc     ra10
+02F8	4759	mov     a, ra10
+02F9	40B9	mov     TimeMinCnt[0], a
+				_L21:
+02FA	475E	mov     a, r210
+02FB	0084	mov     BP, a
+02FC	475F	mov     a, r310
+02FD	008A	mov     STATUS, a
+02FE	4760	mov     a, r410
+02FF	0083	mov     MP1, a
+0300	4761	mov     a, r510
+0301	0081	mov     MP0, a
+0302	4762	mov     a, r610
+0303	0087	mov     TBLP, a
+0304	4763	mov     a, r710
+0305	0089	mov     TBHP, a
+0306	1D05	tabrd   ACC
+0307	475D	mov     a, r110
+0308	0004	reti
+				;232			}			
+				;233		} 	
+				;234	}
+				;235	
+				;236	/*********************************************************************************************************/
+				;237	
+				;238	void __attribute((interrupt(0x0c))) ISR_tmr0 (void)
+				;239	{
+				@ISR_tmr0_code .SECTION 'CODE'
+000C	40E4	mov     r10c, a
+000D	070A	mov     a, STATUS
+000E	40E5	mov     r20c, a
+				L000F:
+000F	2B09	jmp     _ISR_tmr0
+				;240	/*	_t0af=0;*/									// clr TM0 Comparator A match interrupt req flg.
+				;241		_t0pf = 0;//				_ISR_tmr0:
+				_ISR_tmr0:
+0309	3611	clr     T0PF
+				;242		_nop();	
+030A	0000	nop
+030B	4765	mov     a, r20c
+030C	008A	mov     STATUS, a
+030D	4764	mov     a, r10c
+030E	0004	reti
+				;243	}
+				;244	
+				;245	/*********************************************************************************************************
+				;246	** 				;247	** 				;248	** 				;249	** 				;250	** 				;251	** 				;252	********************************************************************************************************/
+				;253	void __attribute((interrupt(0x04))) ISR_int0 (void)
+				;254	{
+				@ISR_int0_code .SECTION 'CODE'
+0004	40E6	mov     r104, a
+0005	0704	mov     a, BP
+0006	40E7	mov     r204, a
+0007	2B0F	jmp     _ISR_int0
+				@dummy4 .SECTION 'CODE'
+0008	0000	nop
+0009	0000	nop
+000A	0000	nop
+000B	0000	nop
+				_ISR_int0:
+				_ISR_int0:
+030F	070A	mov     a, STATUS
+0310	40E8	mov     r304, a
+0311	0703	mov     a, MP1
+0312	40E9	mov     r404, a
+0313	0701	mov     a, MP0
+0314	40EA	mov     r504, a
+				;255	    _int0f=0;
+0315	360E	clr     INT0F
+				;256		if((ChargPlusDly > 170 ) && (ChargPlusDly < 350))	//0316	4742	mov     a, ChargPlusDly[0]
+0317	40EB	mov     ra04, a
+0318	4743	mov     a, ChargPlusDly[1]
+0319	40EC	mov     rb04, a
+031A	0FAA	mov     a, AAH
+031B	426B	sub     a, ra04
+031C	0F00	mov     a, 0H
+031D	526C	sbc     a, rb04
+031E	3C0A	sz      C
+031F	2B3F	jmp     _L30
+0320	4742	mov     a, ChargPlusDly[0]
+0321	40EB	mov     ra04, a
+0322	4743	mov     a, ChargPlusDly[1]
+0323	40EC	mov     rb04, a
+0324	0F5D	mov     a, 5DH
+0325	426B	sub     a, ra04
+0326	0F01	mov     a, 1H
+0327	526C	sbc     a, rb04
+0328	380A	snz     C
+0329	2B3F	jmp     _L30
+				;257		{		
+				;258			if(IntCnt++ >= 2)								//2032A	4745	mov     a, IntCnt[0]
+032B	40EB	mov     ra04, a
+032C	476B	mov     a, ra04
+032D	40EC	mov     rb04, a
+032E	546C	inca    rb04
+032F	40EB	mov     ra04, a
+0330	476B	mov     a, ra04
+0331	40C5	mov     IntCnt[0], a
+0332	0F01	mov     a, 1H
+0333	426C	sub     a, rb04
+0334	3C0A	sz      C
+0335	2B37	jmp     _L31
+				;259				DCInFlag = true;
+0336	7321	set     maiFlagB[0].6
+				;260			Time1SClearCnt = 0;								//				_L31:
+0337	0FD7	mov     a, D7H
+0338	0083	mov     MP1, a
+0339	0F01	mov     a, 1H
+033A	0081	mov     MP0, a
+033B	0701	mov     a, MP0
+033C	0084	mov     BP, a
+033D	0F00	mov     a, 0H
+033E	0082	mov     [02H], a
+				;261		}
+				;262		SleepCnt = 0;										//				_L30:
+033F	5F24	clr     SleepCnt[0]
+				;263		ChargPlusDly = 0;
+0340	5F42	clr     ChargPlusDly[0]
+0341	5F43	clr     ChargPlusDly[1]
+0342	4767	mov     a, r204
+0343	0084	mov     BP, a
+0344	4768	mov     a, r304
+0345	008A	mov     STATUS, a
+0346	4769	mov     a, r404
+0347	0083	mov     MP1, a
+0348	476A	mov     a, r504
+0349	0081	mov     MP0, a
+034A	4766	mov     a, r104
+034B	0004	reti
+				;264	}
+				;file E:\				;1	;;--------------------------------------------------------------;;
+				;2	;;    This file is part of the Holtek C Compiler V3 package     ;;
+				;3	;;    For the initialization of static linkage variables        ;;
+				;4	;;    Copyright (C) 2017 Holtek Semiconductor Inc.              ;;
+				;5	;;    Version: 1.07 (Above IDE3000 V7.94)                       ;;
+				;6	;;    Date:    2017/03/06                                        ;;
+				;7	;;--------------------------------------------------------------;;
+				;8	
+				;9	acc equ [05h]
+				;10	tblp equ [07h]
+				;11	tblh equ [08h]
+				;12	;;tbhp equ [09h] 
+				;13	r0 equ [00h]
+				;14	mp0 equ [01h]
+				;15	r1 equ [02h]
+				;16	mp1l equ [03h]
+				;17	mp1h equ [04h]
+				;18	z equ [0ah].2
+				;19	c equ [0ah].0
+				;20	
+				;21	ifndef tbhp
+				;22	tbhp equ [09h]
+				;23	endif
+				;24	 
+				;25	extern startup_value_1:near
+				;26	
+				;27	@start .section 'code'
+				;28	begin_startup_value:
+				;29	  mov a,low (offset startup_value_1) 
+				begin_startup_value:
+				@start .SECTION 'CODE'
+				@dummy16 .SECTION 'CODE'
+				_main_startup1:
+				@start .SECTION 'CODE'
+0014	0F4E	mov     a, 4EH
+				;30	  mov tblp,a
+0015	0087	mov     TBLP, a
+				;31	  mov a,high (offset startup_value_1) 
+0016	0F00	mov     a, 0H
+				;32	  mov tbhp,a
+0017	0089	mov     TBHP, a
+				;33	next_table:
+				;34	  ;CLR WDT
+				;35	  inc tblp
+				next_table:
+0018	1487	inc     TBLP
+				;36	  sz z
+0019	3D0A	sz      Z
+				;37	  inc tbhp
+001A	1489	inc     TBHP
+				;38	ifdef USE_TABRDC
+				;39	  tabrdc mp0
+				;40	else
+				;41	  tabrd mp0
+001B	1D01	tabrd   MP0
+				;42	endif
+				;43	  sz mp0
+001C	1081	sz      MP0
+				;44	  jmp read_data
+001D	281F	jmp     read_data
+				;45	  jmp startupend1
+001E	2834	jmp     startupend1
+				;46	read_data:
+				;47	  inc tblp
+				read_data:
+001F	1487	inc     TBLP
+				;48	  sz z
+0020	3D0A	sz      Z
+				;49	  inc tbhp
+0021	1489	inc     TBHP
+				;50	ifdef USE_TABRDC
+				;51	  tabrdc mp1l
+				;52	else
+				;53	  tabrd mp1l
+0022	1D03	tabrd   MP1
+				;54	endif
+				;55	  mov a,tblh
+0023	0708	mov     a, TBLH
+				;56	  mov mp1h,a
+0024	0084	mov     BP, a
+				;57	next_data:
+				;58	  inc tblp
+				next_data:
+0025	1487	inc     TBLP
+				;59	  sz z
+0026	3D0A	sz      Z
+				;60	  inc tbhp
+0027	1489	inc     TBHP
+				;61	ifdef USE_TABRDC
+				;62	  tabrdc acc
+				;63	else
+				;64	  tabrd acc
+0028	1D05	tabrd   ACC
+				;65	endif
+				;66	  mov r1,a
+0029	0082	mov     [02H], a
+				;67	  sdz mp0
+002A	1781	sdz     MP0
+				;68	  jmp $+2
+002B	282D	jmp     L002D
+				;69	  jmp next_table
+002C	2818	jmp     next_table
+				;70	  inc mp1l
+				L002D:
+002D	1483	inc     MP1
+				;71	  mov a,tblh
+002E	0708	mov     a, TBLH
+				;72	  mov r1,a
+002F	0082	mov     [02H], a
+				;73	  inc mp1l
+0030	1483	inc     MP1
+				;74	  sdz mp0
+0031	1781	sdz     MP0
+				;75	  jmp next_data
+0032	2825	jmp     next_data
+				;76	  jmp next_table
+0033	2818	jmp     next_table
+				;77	
+				;78	;end_startup_value:
+				;79	
+				;80	startupend1:
+				;81	ifndef Disable_Bit_Initial
+				;82		MOV A,high  bitdatasec1_start
+				startupend1:
+0034	0F00	mov     a, 0H
+				;83		MOV mp1h,a
+0035	0084	mov     BP, a
+				;84		MOV A,offset bitdatasec1_end
+0036	0FD4	mov     a, D4H
+				;85		mov mp1l,A
+0037	0083	mov     MP1, a
+				;86		dec mp1l
+0038	1583	dec     MP1
+				;87		clr z
+0039	350A	clr     Z
+				;88		sub a,offset bitdatasec1_start
+003A	0AD4	sub     a, D4H
+				;89		sz z
+003B	3D0A	sz      Z
+				;90		jmp startupend2
+003C	2841	jmp     startupend2
+				;91	L0005:
+				;92		set r1
+				L0005:
+003D	1F82	set     [02H]
+				;93		dec mp1l
+003E	1583	dec     MP1
+				;94		sdz  acc
+003F	1785	sdz     ACC
+				;95		jmp L0005
+0040	283D	jmp     L0005
+				;96	
+				;97	startupend2:
+				;98		MOV A,high  bitdatasec0_start
+				startupend2:
+0041	0F00	mov     a, 0H
+				;99		MOV mp1h,a
+0042	0084	mov     BP, a
+				;100		MOV A,offset bitdatasec0_end
+0043	0FD4	mov     a, D4H
+				;101		mov mp1l,A
+0044	0083	mov     MP1, a
+				;102		dec mp1l
+0045	1583	dec     MP1
+				;103		clr z
+0046	350A	clr     Z
+				;104		sub a,offset bitdatasec0_start
+0047	0AD4	sub     a, D4H
+				;105		sz  z
+0048	3D0A	sz      Z
+				;106		jmp startupend3
+0049	284E	jmp     startupend3
+				;107	L0006:
+				;108		clr r1
+				L0006:
+004A	1F02	clr     [02H]
+				;109		dec mp1l
+004B	1583	dec     MP1
+				;110		sdz  acc
+004C	1785	sdz     ACC
+				;111		jmp L0006
+004D	284A	jmp     L0006
+				;112	startupend3:
+				;113	endif		
+				;114	   
+				;115	@ROMDATA_BASE .SECTION com_l 'CODE'  
+				;116	startup_value:
+				;117	;;linker range the initial value table here
+				;118	
+				;119	@BITDATASEC1 .SECTION com_l 'DATA'  
+				;120	bitdatasec1_start:
+				;121	
+				;122	@BITDATASEC1 .SECTION com_e 'DATA'  
+				;123	bitdatasec1_end:
+				;124	
+				;125	@BITDATASEC .SECTION com_l 'DATA'  
+				;126	bitdatasec0_start:
+				;127	
+				;128	@BITDATASEC .SECTION com_e 'DATA'  
+				;129	bitdatasec0_end:
+				;file E:\				;1	#include "base.h"
+				;2	#define EXTERN extern
+				;3	#include "Var.h"
+				;4	
+				;5	#define MIN_VALU		500		//				;6	
+				;7	#define Temp_20C		1820//2100		//   22c   11.4239  1912
+				;8	
+				;9	#define Temp_22C		1911//2100		//   22c   11.4239  1912
+				;10	#define Temp_37C		2396//2200		//   37c   6.0053   2560
+				;11	#define Temp_45C		2478//2400		//   45c   4.3558   2853
+				;12	
+				;13	#define Bat_4_2V		1789		//4.2v 				;14	#define Bat_3_3V		1410		//3.3V 				;15	
+				;16	extern unsigned int ntc_val;
+				;17	unsigned int k;
+				;18	unsigned char adcsp = 0;
+				;19	unsigned int k2; 
+				;20	unsigned char adcsp_2 = 0;
+				;21	//22				;22	const u16 AllTempTab[26] = {1820,1866,1911,1957,2002,2048,2092,
+0061	071C	mov     a, CTRL
+0062	074A	mov     a, __pcpu[8]
+0063	0777	mov     a, __pcpu[53]
+0064	07A5	dc	007A5H
+0065	07D2	dc	007D2H
+0066	0800	dc	00800H
+0067	082C	dc	0082CH
+0068	0859	dc	00859H
+0069	0885	dc	00885H
+006A	08B1	dc	008B1H
+006B	08DD	dc	008DDH
+006C	0908	ret     a, 8H
+006D	0932	ret     a, 32H
+006E	095C	ret     a, 5CH
+006F	08FD	dc	008FDH
+0070	09AE	ret     a, AEH
+0071	09D7	ret     a, D7H
+0072	09FF	ret     a, FFH
+0073	0A26	sub     a, 26H
+0074	0A4C	sub     a, 4CH
+0075	0A6F	sub     a, 6FH
+0076	0A97	sub     a, 97H
+0077	0ABB	sub     a, BBH
+0078	0ADF	sub     a, DFH
+0079	0B02	add     a, 2H
+007A	0B25	add     a, 25H
+				;23							  	2137,2181,2225,2269,
+				;24							  	2312,2354,2396,2301,2478,
+				;25							  	2519,2559,2598,2636,2671,
+				;26							  	2711,2747,2783,2818,2853};
+				;27							  
+				;28	u8 MaxTempIndex = 15;	//37				;29	
+				;30	//********************** READ NTC_DAT **************************************//
+				;31	void GetPTCValu(void)  
+				;32	{
+				;33		unsigned char i;
+				;34		unsigned short min,max;
+				;35		volatile static unsigned short adcBuf[10] __attribute__ ((at(0x1c0)));  // 1C0
+				;36	
+				;37		_adcr0 = ADC_NTC;			//	NTC				_GetPTCValu:
+				_GetPTCValu:
+05DB	0F13	mov     a, 13H
+05DC	00A2	mov     ADCR0, a
+				;38		STAR_ADC();
+05DD	37A2	clr     START
+05DE	33A2	set     START
+05DF	37A2	clr     START
+				;39		while(_eocb);				// 				_L2:
+05E0	0722	mov     a, ADCR0
+05E1	40D5	mov     ra, a
+05E2	0F40	mov     a, 40H
+05E3	46D5	andm    a, ra
+05E4	50D5	sz      ra
+05E5	2DE0	jmp     _L2
+				;40	    
+				;41	    k = _adrh;
+05E6	0721	mov     a, ADRH
+05E7	40D5	mov     ra, a
+05E8	5F56	clr     rb
+05E9	4755	mov     a, ra
+05EA	40CE	mov     k[0], a
+05EB	4756	mov     a, rb
+05EC	40CF	mov     k[1], a
+				;42	    k <<= 8;
+05ED	474E	mov     a, k[0]
+05EE	40D5	mov     ra, a
+05EF	474F	mov     a, k[1]
+05F0	40D6	mov     rb, a
+05F1	4755	mov     a, ra
+05F2	40D6	mov     rb, a
+05F3	5F55	clr     ra
+05F4	4755	mov     a, ra
+05F5	40CE	mov     k[0], a
+05F6	4756	mov     a, rb
+05F7	40CF	mov     k[1], a
+				;43	    k += _adrl;
+05F8	0720	mov     a, ADRL
+05F9	40D5	mov     ra, a
+05FA	4755	mov     a, ra
+05FB	40D7	mov     rc, a
+05FC	5F58	clr     rd
+05FD	474E	mov     a, k[0]
+05FE	40D5	mov     ra, a
+05FF	474F	mov     a, k[1]
+0600	40D6	mov     rb, a
+0601	4757	mov     a, rc
+0602	43D5	addm    a, ra
+0603	4758	mov     a, rd
+0604	53D6	adcm    a, rb
+0605	4755	mov     a, ra
+0606	40CE	mov     k[0], a
+0607	4756	mov     a, rb
+0608	40CF	mov     k[1], a
+				;44	    if(adcsp < 10) 
+0609	474B	mov     a, adcsp[0]
+060A	40D5	mov     ra, a
+060B	0F09	mov     a, 9H
+060C	4255	sub     a, ra
+060D	380A	snz     C
+060E	2E12	jmp     _L3
+				;45	    	i = adcsp;
+060F	474B	mov     a, adcsp[0]
+0610	40ED	mov     i[0], a
+0611	2E18	jmp     _L4
+				;46	    else  
+				;47	    	i = adcsp - 10;
+				_L3:
+0612	474B	mov     a, adcsp[0]
+0613	40D5	mov     ra, a
+0614	0FF6	mov     a, F6H
+0615	43D5	addm    a, ra
+0616	4755	mov     a, ra
+0617	40ED	mov     i[0], a
+				;48	    adcBuf[i] = k;
+				_L4:
+0618	476D	mov     a, i[0]
+0619	40D5	mov     ra, a
+061A	5F56	clr     rb
+061B	474E	mov     a, k[0]
+061C	40D7	mov     rc, a
+061D	474F	mov     a, k[1]
+061E	40D8	mov     rd, a
+061F	340A	clr     C
+0620	5AD5	rlc     ra
+0621	5AD6	rlc     rb
+0622	0FC0	mov     a, C0H
+0623	43D5	addm    a, ra
+0624	0F01	mov     a, 1H
+0625	53D6	adcm    a, rb
+0626	4755	mov     a, ra
+0627	0083	mov     MP1, a
+0628	4756	mov     a, rb
+0629	0081	mov     MP0, a
+062A	0701	mov     a, MP0
+062B	0084	mov     BP, a
+062C	4757	mov     a, rc
+062D	0082	mov     [02H], a
+062E	1483	inc     MP1
+062F	4758	mov     a, rd
+0630	0082	mov     [02H], a
+				;49	    if(adcsp < 11) 				//0631	474B	mov     a, adcsp[0]
+0632	40D5	mov     ra, a
+0633	0F0A	mov     a, AH
+0634	4255	sub     a, ra
+0635	380A	snz     C
+0636	2E3D	jmp     _L5
+				;50	    {
+				;51	    	adcsp++; 
+0637	474B	mov     a, adcsp[0]
+0638	40D5	mov     ra, a
+0639	54D5	inc     ra
+063A	4755	mov     a, ra
+063B	40CB	mov     adcsp[0], a
+				;52	    	return;
+063C	2FA5	jmp     _L1
+				;53	    }
+				;54	    adcsp = 0;
+				_L5:
+063D	5F4B	clr     adcsp[0]
+				;55	    k = adcBuf[0];
+063E	0FC0	mov     a, C0H
+063F	0083	mov     MP1, a
+0640	0F01	mov     a, 1H
+0641	0081	mov     MP0, a
+0642	0701	mov     a, MP0
+0643	0084	mov     BP, a
+0644	0702	mov     a, [02H]
+0645	40D5	mov     ra, a
+0646	1483	inc     MP1
+0647	0702	mov     a, [02H]
+0648	40D6	mov     rb, a
+0649	4755	mov     a, ra
+064A	40CE	mov     k[0], a
+064B	4756	mov     a, rb
+064C	40CF	mov     k[1], a
+				;56	    min = k;
+064D	474E	mov     a, k[0]
+064E	40EE	mov     min[0], a
+064F	474F	mov     a, k[1]
+0650	40EF	mov     min[1], a
+				;57	    max = k;
+0651	474E	mov     a, k[0]
+0652	40F0	mov     max[0], a
+0653	474F	mov     a, k[1]
+0654	40F1	mov     max[1], a
+				;58	    for(i=1;i<10;i++)
+0655	0F01	mov     a, 1H
+0656	40ED	mov     i[0], a
+0657	2ECE	jmp     _L7
+06CA	476D	mov     a, i[0]
+06CB	40D5	mov     ra, a
+06CC	5455	inca    ra
+06CD	40ED	mov     i[0], a
+				_L7:
+06CE	0F09	mov     a, 9H
+06CF	426D	sub     a, i[0]
+06D0	3C0A	sz      C
+06D1	2E58	jmp     _L10
+				;59	    {
+				;60	        if(min > adcBuf[i])  
+				_L10:
+0658	476D	mov     a, i[0]
+0659	40D5	mov     ra, a
+065A	5F56	clr     rb
+065B	340A	clr     C
+065C	5AD5	rlc     ra
+065D	5AD6	rlc     rb
+065E	0FC0	mov     a, C0H
+065F	43D5	addm    a, ra
+0660	0F01	mov     a, 1H
+0661	53D6	adcm    a, rb
+0662	4755	mov     a, ra
+0663	0083	mov     MP1, a
+0664	4756	mov     a, rb
+0665	0081	mov     MP0, a
+0666	61F4	call    L09F4
+0667	40D5	mov     ra, a
+0668	61F3	call    L09F3
+0669	40D6	mov     rb, a
+066A	4755	mov     a, ra
+066B	426E	sub     a, min[0]
+066C	4756	mov     a, rb
+066D	526F	sbc     a, min[1]
+066E	3C0A	sz      C
+066F	2E82	jmp     _L8
+				;61	        	min = adcBuf[i];
+0670	476D	mov     a, i[0]
+0671	40D5	mov     ra, a
+0672	5F56	clr     rb
+0673	340A	clr     C
+0674	5AD5	rlc     ra
+0675	5AD6	rlc     rb
+0676	0FC0	mov     a, C0H
+0677	43D5	addm    a, ra
+0678	0F01	mov     a, 1H
+0679	53D6	adcm    a, rb
+067A	4755	mov     a, ra
+067B	0083	mov     MP1, a
+067C	4756	mov     a, rb
+067D	0081	mov     MP0, a
+067E	61F4	call    L09F4
+067F	40EE	mov     min[0], a
+0680	61F3	call    L09F3
+0681	40EF	mov     min[1], a
+				;62	        if(max < adcBuf[i])  
+				_L8:
+0682	476D	mov     a, i[0]
+0683	40D5	mov     ra, a
+0684	5F56	clr     rb
+0685	340A	clr     C
+0686	5AD5	rlc     ra
+0687	5AD6	rlc     rb
+0688	0FC0	mov     a, C0H
+0689	43D5	addm    a, ra
+068A	0F01	mov     a, 1H
+068B	53D6	adcm    a, rb
+068C	4755	mov     a, ra
+068D	0083	mov     MP1, a
+068E	4756	mov     a, rb
+068F	0081	mov     MP0, a
+0690	61F4	call    L09F4
+0691	40D5	mov     ra, a
+0692	61F3	call    L09F3
+0693	40D6	mov     rb, a
+0694	4770	mov     a, max[0]
+0695	4255	sub     a, ra
+0696	4771	mov     a, max[1]
+0697	5256	sbc     a, rb
+0698	3C0A	sz      C
+0699	2EAC	jmp     _L9
+				;63	        	max = adcBuf[i];
+069A	476D	mov     a, i[0]
+069B	40D5	mov     ra, a
+069C	5F56	clr     rb
+069D	340A	clr     C
+069E	5AD5	rlc     ra
+069F	5AD6	rlc     rb
+06A0	0FC0	mov     a, C0H
+06A1	43D5	addm    a, ra
+06A2	0F01	mov     a, 1H
+06A3	53D6	adcm    a, rb
+06A4	4755	mov     a, ra
+06A5	0083	mov     MP1, a
+06A6	4756	mov     a, rb
+06A7	0081	mov     MP0, a
+06A8	61F4	call    L09F4
+06A9	40F0	mov     max[0], a
+06AA	61F3	call    L09F3
+06AB	40F1	mov     max[1], a
+				;64	        k += adcBuf[i]; 
+				_L9:
+06AC	476D	mov     a, i[0]
+06AD	40D5	mov     ra, a
+06AE	5F56	clr     rb
+06AF	340A	clr     C
+06B0	5AD5	rlc     ra
+06B1	5AD6	rlc     rb
+06B2	0FC0	mov     a, C0H
+06B3	43D5	addm    a, ra
+06B4	0F01	mov     a, 1H
+06B5	53D6	adcm    a, rb
+06B6	4755	mov     a, ra
+06B7	0083	mov     MP1, a
+06B8	4756	mov     a, rb
+06B9	0081	mov     MP0, a
+06BA	61F4	call    L09F4
+06BB	40D7	mov     rc, a
+06BC	61F3	call    L09F3
+06BD	40D8	mov     rd, a
+06BE	474E	mov     a, k[0]
+06BF	40D5	mov     ra, a
+06C0	474F	mov     a, k[1]
+06C1	40D6	mov     rb, a
+06C2	4757	mov     a, rc
+06C3	43D5	addm    a, ra
+06C4	4758	mov     a, rd
+06C5	53D6	adcm    a, rb
+06C6	4755	mov     a, ra
+06C7	40CE	mov     k[0], a
+06C8	4756	mov     a, rb
+06C9	40CF	mov     k[1], a
+				;65	    }
+				;66	    k -= min; k -= max; k >>= 3;			//06D2	474E	mov     a, k[0]
+06D3	40D5	mov     ra, a
+06D4	474F	mov     a, k[1]
+06D5	40D6	mov     rb, a
+06D6	4755	mov     a, ra
+06D7	426E	sub     a, min[0]
+06D8	40D5	mov     ra, a
+06D9	4756	mov     a, rb
+06DA	526F	sbc     a, min[1]
+06DB	40D6	mov     rb, a
+06DC	4755	mov     a, ra
+06DD	40CE	mov     k[0], a
+06DE	4756	mov     a, rb
+06DF	40CF	mov     k[1], a
+06E0	474E	mov     a, k[0]
+06E1	40D5	mov     ra, a
+06E2	474F	mov     a, k[1]
+06E3	40D6	mov     rb, a
+06E4	4755	mov     a, ra
+06E5	4270	sub     a, max[0]
+06E6	40D5	mov     ra, a
+06E7	4756	mov     a, rb
+06E8	5271	sbc     a, max[1]
+06E9	40D6	mov     rb, a
+06EA	4755	mov     a, ra
+06EB	40CE	mov     k[0], a
+06EC	4756	mov     a, rb
+06ED	40CF	mov     k[1], a
+06EE	474E	mov     a, k[0]
+06EF	40D5	mov     ra, a
+06F0	474F	mov     a, k[1]
+06F1	40D6	mov     rb, a
+06F2	0F03	mov     a, 3H
+				_LI1:
+06F3	340A	clr     C
+06F4	5BD6	rrc     rb
+06F5	5BD5	rrc     ra
+06F6	1785	sdz     ACC
+06F7	2EF3	jmp     _LI1
+06F8	4755	mov     a, ra
+06F9	40CE	mov     k[0], a
+06FA	4756	mov     a, rb
+06FB	40CF	mov     k[1], a
+				;67	    
+				;68	/*******************************************************************************************/
+				;69		if((k > Temp_22C) && (k < Temp_37C))		//  22C - 37C
+06FC	474E	mov     a, k[0]
+06FD	40D5	mov     ra, a
+06FE	474F	mov     a, k[1]
+06FF	40D6	mov     rb, a
+0700	0F77	mov     a, 77H
+0701	4255	sub     a, ra
+0702	0F07	mov     a, 7H
+0703	5256	sbc     a, rb
+0704	3C0A	sz      C
+0705	2F1A	jmp     _L11
+0706	474E	mov     a, k[0]
+0707	40D5	mov     ra, a
+0708	474F	mov     a, k[1]
+0709	40D6	mov     rb, a
+070A	0F5B	mov     a, 5BH
+070B	4255	sub     a, ra
+070C	0F09	mov     a, 9H
+070D	5256	sbc     a, rb
+070E	380A	snz     C
+070F	2F1A	jmp     _L11
+				;70		{
+				;71			if(SumOfEdge >= 120)	//1200710	4736	mov     a, SumOfEdge[0]
+0711	40D5	mov     ra, a
+0712	0F77	mov     a, 77H
+0713	4255	sub     a, ra
+0714	3C0A	sz      C
+0715	2F19	jmp     _L12
+0718	2F4B	jmp     _L13
+				_L12:
+0719	2F4B	jmp     _L13
+				;72				TempSta = IN_22_37;
+0716	0F01	mov     a, 1H
+0717	40B0	mov     TempSta[0], a
+				;73		}    
+				;74		else if((k > Temp_37C) && (k < Temp_45C))		// 				_L11:
+071A	474E	mov     a, k[0]
+071B	40D5	mov     ra, a
+071C	474F	mov     a, k[1]
+071D	40D6	mov     rb, a
+071E	0F5C	mov     a, 5CH
+071F	4255	sub     a, ra
+0720	0F09	mov     a, 9H
+0721	5256	sbc     a, rb
+0722	3C0A	sz      C
+0723	2F32	jmp     _L14
+0724	474E	mov     a, k[0]
+0725	40D5	mov     ra, a
+0726	474F	mov     a, k[1]
+0727	40D6	mov     rb, a
+0728	0FAD	mov     a, ADH
+0729	4255	sub     a, ra
+072A	0F09	mov     a, 9H
+072B	5256	sbc     a, rb
+072C	380A	snz     C
+072D	2F32	jmp     _L14
+				;75		{
+				;76			SumOfEdge = 0;
+072E	5F36	clr     SumOfEdge[0]
+				;77			TempSta = IN_37_45;
+072F	0F02	mov     a, 2H
+0730	40B0	mov     TempSta[0], a
+0731	2F4B	jmp     _L13
+				;78		}
+				;79		else if(k < Temp_22C)		// 				_L14:
+0732	474E	mov     a, k[0]
+0733	40D5	mov     ra, a
+0734	474F	mov     a, k[1]
+0735	40D6	mov     rb, a
+0736	0F76	mov     a, 76H
+0737	4255	sub     a, ra
+0738	0F07	mov     a, 7H
+0739	5256	sbc     a, rb
+073A	380A	snz     C
+073B	2F3E	jmp     _L15
+				;80		{
+				;81			TempSta = DOWN_22;
+073C	5F30	clr     TempSta[0]
+073D	2F4B	jmp     _L13
+				;82		}
+				;83		else if(k > Temp_45C)
+				_L15:
+073E	474E	mov     a, k[0]
+073F	40D5	mov     ra, a
+0740	474F	mov     a, k[1]
+0741	40D6	mov     rb, a
+0742	0FAE	mov     a, AEH
+0743	4255	sub     a, ra
+0744	0F09	mov     a, 9H
+0745	5256	sbc     a, rb
+0746	3C0A	sz      C
+0747	2F4B	jmp     _L13
+				;84		{
+				;85			SumOfEdge = 0;
+0748	5F36	clr     SumOfEdge[0]
+				;86			TempSta = UP_45;
+0749	0F03	mov     a, 3H
+074A	40B0	mov     TempSta[0], a
+				;87		}
+				;88	//					;89		if(k > AllTempTab[MaxTempIndex])	//				_L13:
+074B	474D	mov     a, MaxTempIndex[0]
+074C	40D5	mov     ra, a
+074D	5F56	clr     rb
+074E	340A	clr     C
+074F	5AD5	rlc     ra
+0750	5AD6	rlc     rb
+0751	0FC2	mov     a, C2H
+0752	43D5	addm    a, ra
+0753	0F80	mov     a, 80H
+0754	53D6	adcm    a, rb
+0755	4755	mov     a, ra
+0756	0083	mov     MP1, a
+0757	4756	mov     a, rb
+0758	0081	mov     MP0, a
+0759	61F4	call    L09F4
+075A	40D7	mov     rc, a
+075B	61F3	call    L09F3
+075C	40D8	mov     rd, a
+075D	474E	mov     a, k[0]
+075E	40D5	mov     ra, a
+075F	474F	mov     a, k[1]
+0760	40D6	mov     rb, a
+0761	4757	mov     a, rc
+0762	4255	sub     a, ra
+0763	4758	mov     a, rd
+0764	5256	sbc     a, rb
+0765	3C0A	sz      C
+0766	2F6A	jmp     _L16
+				;90		{
+				;91	    	ntc_val = 0;
+0767	5F31	clr     ntc_val[0]
+0768	5F32	clr     ntc_val[1]
+0769	2FA5	jmp     _L1
+				;92		}
+				;93	    else if(k > Temp_20C)
+				_L16:
+076A	474E	mov     a, k[0]
+076B	40D5	mov     ra, a
+076C	474F	mov     a, k[1]
+076D	40D6	mov     rb, a
+076E	0F1C	mov     a, 1CH
+076F	4255	sub     a, ra
+0770	0F07	mov     a, 7H
+0771	5256	sbc     a, rb
+0772	3C0A	sz      C
+0773	2FA5	jmp     _L1
+				;94	    {
+				;95	    	ntc_val = (AllTempTab[MaxTempIndex] - k)<<2;
+0774	474D	mov     a, MaxTempIndex[0]
+0775	40D5	mov     ra, a
+0776	5F56	clr     rb
+0777	340A	clr     C
+0778	5AD5	rlc     ra
+0779	5AD6	rlc     rb
+077A	0FC2	mov     a, C2H
+077B	43D5	addm    a, ra
+077C	0F80	mov     a, 80H
+077D	53D6	adcm    a, rb
+077E	4755	mov     a, ra
+077F	0083	mov     MP1, a
+0780	4756	mov     a, rb
+0781	0081	mov     MP0, a
+0782	61F4	call    L09F4
+0783	40D7	mov     rc, a
+0784	61F3	call    L09F3
+0785	40D8	mov     rd, a
+0786	474E	mov     a, k[0]
+0787	40D5	mov     ra, a
+0788	474F	mov     a, k[1]
+0789	40D6	mov     rb, a
+078A	4757	mov     a, rc
+078B	42D5	subm    a, ra
+078C	4758	mov     a, rd
+078D	52D6	sbcm    a, rb
+078E	340A	clr     C
+078F	5AD5	rlc     ra
+0790	5AD6	rlc     rb
+0791	340A	clr     C
+0792	5AD5	rlc     ra
+0793	5AD6	rlc     rb
+0794	4755	mov     a, ra
+0795	40B1	mov     ntc_val[0], a
+0796	4756	mov     a, rb
+0797	40B2	mov     ntc_val[1], a
+				;96	    	if(ntc_val > 2048)
+0798	4731	mov     a, ntc_val[0]
+0799	40D5	mov     ra, a
+079A	4732	mov     a, ntc_val[1]
+079B	40D6	mov     rb, a
+079C	0F00	mov     a, 0H
+079D	4255	sub     a, ra
+079E	0F08	mov     a, 8H
+079F	5256	sbc     a, rb
+07A0	3C0A	sz      C
+07A1	2FA5	jmp     _L1
+				;97	    		ntc_val = 2048;	
+07A2	5F31	clr     ntc_val[0]
+07A3	0F08	mov     a, 8H
+07A4	40B2	mov     ntc_val[1], a
+				_L1:
+07A5	0003	ret
+				;98	    }		 
+				;99	
+				;100	}
+				;101	#define MAX_INDOOR_TMEP		17 //				;102	//********************** READ BATTERY_DAT **************************************//
+				;103	void Get_Battery_Valu(void)  
+				;104	{
+				;105		unsigned char i;
+				;106		unsigned short min,max;
+				;107		volatile static unsigned short adcBuf[10] __attribute__ ((at(0x1eb)));  // 1C0 -1d5
+				;108	
+				;109		_adcr0 = ADC_BATTERY;			//					_Get_Battery_Valu:
+				_Get_Battery_Valu:
+07A6	0F15	mov     a, 15H
+07A7	00A2	mov     ADCR0, a
+				;110		STAR_ADC();
+07A8	37A2	clr     START
+07A9	33A2	set     START
+07AA	37A2	clr     START
+				;111		while(_eocb);				// 				_L18:
+07AB	0722	mov     a, ADCR0
+07AC	40D5	mov     ra, a
+07AD	0F40	mov     a, 40H
+07AE	46D5	andm    a, ra
+07AF	50D5	sz      ra
+07B0	2FAB	jmp     _L18
+				;112	    
+				;113	    k2 = _adrh;
+07B1	0721	mov     a, ADRH
+07B2	40D5	mov     ra, a
+07B3	5F56	clr     rb
+07B4	4755	mov     a, ra
+07B5	40D0	mov     k2[0], a
+07B6	4756	mov     a, rb
+07B7	40D1	mov     k2[1], a
+				;114	    k2 <<= 8;
+07B8	4750	mov     a, k2[0]
+07B9	40D5	mov     ra, a
+07BA	4751	mov     a, k2[1]
+07BB	40D6	mov     rb, a
+07BC	4755	mov     a, ra
+07BD	40D6	mov     rb, a
+07BE	5F55	clr     ra
+07BF	4755	mov     a, ra
+07C0	40D0	mov     k2[0], a
+07C1	4756	mov     a, rb
+07C2	40D1	mov     k2[1], a
+				;115	    k2 += _adrl;
+07C3	0720	mov     a, ADRL
+07C4	40D5	mov     ra, a
+07C5	4755	mov     a, ra
+07C6	40D7	mov     rc, a
+07C7	5F58	clr     rd
+07C8	4750	mov     a, k2[0]
+07C9	40D5	mov     ra, a
+07CA	4751	mov     a, k2[1]
+07CB	40D6	mov     rb, a
+07CC	4757	mov     a, rc
+07CD	43D5	addm    a, ra
+07CE	4758	mov     a, rd
+07CF	53D6	adcm    a, rb
+07D0	4755	mov     a, ra
+07D1	40D0	mov     k2[0], a
+07D2	4756	mov     a, rb
+07D3	40D1	mov     k2[1], a
+				;116	    if(adcsp_2 < 10) 
+07D4	474C	mov     a, adcsp_2[0]
+07D5	40D5	mov     ra, a
+07D6	0F09	mov     a, 9H
+07D7	4255	sub     a, ra
+07D8	380A	snz     C
+07D9	2FDD	jmp     _L19
+				;117	    	i = adcsp_2;
+07DA	474C	mov     a, adcsp_2[0]
+07DB	40ED	mov     i[0], a
+07DC	2FE3	jmp     _L20
+				;118	    else  
+				;119	    	i = adcsp_2 - 10;
+				_L19:
+07DD	474C	mov     a, adcsp_2[0]
+07DE	40D5	mov     ra, a
+07DF	0FF6	mov     a, F6H
+07E0	43D5	addm    a, ra
+07E1	4755	mov     a, ra
+07E2	40ED	mov     i[0], a
+				;120	    adcBuf[i] = k2;
+				_L20:
+07E3	476D	mov     a, i[0]
+07E4	40D5	mov     ra, a
+07E5	5F56	clr     rb
+07E6	4750	mov     a, k2[0]
+07E7	40D7	mov     rc, a
+07E8	4751	mov     a, k2[1]
+07E9	40D8	mov     rd, a
+07EA	340A	clr     C
+07EB	5AD5	rlc     ra
+07EC	5AD6	rlc     rb
+07ED	0FEB	mov     a, EBH
+07EE	43D5	addm    a, ra
+07EF	0F01	mov     a, 1H
+07F0	53D6	adcm    a, rb
+07F1	4755	mov     a, ra
+07F2	0083	mov     MP1, a
+07F3	4756	mov     a, rb
+07F4	0081	mov     MP0, a
+07F5	0701	mov     a, MP0
+07F6	0084	mov     BP, a
+07F7	4757	mov     a, rc
+07F8	0082	mov     [02H], a
+07F9	1483	inc     MP1
+07FA	4758	mov     a, rd
+07FB	0082	mov     [02H], a
+				;121	    if(adcsp_2 < 11) 				//07FC	474C	mov     a, adcsp_2[0]
+07FD	40D5	mov     ra, a
+07FE	0F0A	mov     a, AH
+07FF	4255	sub     a, ra
+0800	380A	snz     C
+0801	6808	jmp     _L21
+				;122	    {
+				;123	    	adcsp_2++; 
+0802	474C	mov     a, adcsp_2[0]
+0803	40D5	mov     ra, a
+0804	54D5	inc     ra
+0805	4755	mov     a, ra
+0806	40CC	mov     adcsp_2[0], a
+				;124	    	return;
+0807	68F3	jmp     _L17
+				;125	    }
+				;126	    adcsp_2 = 0;
+				_L21:
+0808	5F4C	clr     adcsp_2[0]
+				;127	    k2 = adcBuf[0];
+0809	0FEB	mov     a, EBH
+080A	0083	mov     MP1, a
+080B	0F01	mov     a, 1H
+080C	0081	mov     MP0, a
+080D	0701	mov     a, MP0
+080E	0084	mov     BP, a
+080F	0702	mov     a, [02H]
+0810	40D5	mov     ra, a
+0811	1483	inc     MP1
+0812	0702	mov     a, [02H]
+0813	40D6	mov     rb, a
+0814	4755	mov     a, ra
+0815	40D0	mov     k2[0], a
+0816	4756	mov     a, rb
+0817	40D1	mov     k2[1], a
+				;128	    min = k2;
+0818	4750	mov     a, k2[0]
+0819	40EE	mov     min[0], a
+081A	4751	mov     a, k2[1]
+081B	40EF	mov     min[1], a
+				;129	    max = k2;
+081C	4750	mov     a, k2[0]
+081D	40F0	mov     max[0], a
+081E	4751	mov     a, k2[1]
+081F	40F1	mov     max[1], a
+				;130	    for(i=1;i<10;i++)
+0820	0F01	mov     a, 1H
+0821	40ED	mov     i[0], a
+0822	6899	jmp     _L23
+0895	476D	mov     a, i[0]
+0896	40D5	mov     ra, a
+0897	5455	inca    ra
+0898	40ED	mov     i[0], a
+				_L23:
+0899	0F09	mov     a, 9H
+089A	426D	sub     a, i[0]
+089B	3C0A	sz      C
+089C	6823	jmp     _L26
+				;131	    {
+				;132	        if(min > adcBuf[i])  
+				_L26:
+0823	476D	mov     a, i[0]
+0824	40D5	mov     ra, a
+0825	5F56	clr     rb
+0826	340A	clr     C
+0827	5AD5	rlc     ra
+0828	5AD6	rlc     rb
+0829	0FEB	mov     a, EBH
+082A	43D5	addm    a, ra
+082B	0F01	mov     a, 1H
+082C	53D6	adcm    a, rb
+082D	4755	mov     a, ra
+082E	0083	mov     MP1, a
+082F	4756	mov     a, rb
+0830	0081	mov     MP0, a
+0831	61F4	call    L09F4
+0832	40D5	mov     ra, a
+0833	61F3	call    L09F3
+0834	40D6	mov     rb, a
+0835	4755	mov     a, ra
+0836	426E	sub     a, min[0]
+0837	4756	mov     a, rb
+0838	526F	sbc     a, min[1]
+0839	3C0A	sz      C
+083A	684D	jmp     _L24
+				;133	        	min = adcBuf[i];
+083B	476D	mov     a, i[0]
+083C	40D5	mov     ra, a
+083D	5F56	clr     rb
+083E	340A	clr     C
+083F	5AD5	rlc     ra
+0840	5AD6	rlc     rb
+0841	0FEB	mov     a, EBH
+0842	43D5	addm    a, ra
+0843	0F01	mov     a, 1H
+0844	53D6	adcm    a, rb
+0845	4755	mov     a, ra
+0846	0083	mov     MP1, a
+0847	4756	mov     a, rb
+0848	0081	mov     MP0, a
+0849	61F4	call    L09F4
+084A	40EE	mov     min[0], a
+084B	61F3	call    L09F3
+084C	40EF	mov     min[1], a
+				;134	        if(max < adcBuf[i])  
+				_L24:
+084D	476D	mov     a, i[0]
+084E	40D5	mov     ra, a
+084F	5F56	clr     rb
+0850	340A	clr     C
+0851	5AD5	rlc     ra
+0852	5AD6	rlc     rb
+0853	0FEB	mov     a, EBH
+0854	43D5	addm    a, ra
+0855	0F01	mov     a, 1H
+0856	53D6	adcm    a, rb
+0857	4755	mov     a, ra
+0858	0083	mov     MP1, a
+0859	4756	mov     a, rb
+085A	0081	mov     MP0, a
+085B	61F4	call    L09F4
+085C	40D5	mov     ra, a
+085D	61F3	call    L09F3
+085E	40D6	mov     rb, a
+085F	4770	mov     a, max[0]
+0860	4255	sub     a, ra
+0861	4771	mov     a, max[1]
+0862	5256	sbc     a, rb
+0863	3C0A	sz      C
+0864	6877	jmp     _L25
+				;135	        	max = adcBuf[i];
+0865	476D	mov     a, i[0]
+0866	40D5	mov     ra, a
+0867	5F56	clr     rb
+0868	340A	clr     C
+0869	5AD5	rlc     ra
+086A	5AD6	rlc     rb
+086B	0FEB	mov     a, EBH
+086C	43D5	addm    a, ra
+086D	0F01	mov     a, 1H
+086E	53D6	adcm    a, rb
+086F	4755	mov     a, ra
+0870	0083	mov     MP1, a
+0871	4756	mov     a, rb
+0872	0081	mov     MP0, a
+0873	61F4	call    L09F4
+0874	40F0	mov     max[0], a
+0875	61F3	call    L09F3
+0876	40F1	mov     max[1], a
+				;136	        k2 += adcBuf[i]; 
+				_L25:
+0877	476D	mov     a, i[0]
+0878	40D5	mov     ra, a
+0879	5F56	clr     rb
+087A	340A	clr     C
+087B	5AD5	rlc     ra
+087C	5AD6	rlc     rb
+087D	0FEB	mov     a, EBH
+087E	43D5	addm    a, ra
+087F	0F01	mov     a, 1H
+0880	53D6	adcm    a, rb
+0881	4755	mov     a, ra
+0882	0083	mov     MP1, a
+0883	4756	mov     a, rb
+0884	0081	mov     MP0, a
+0885	61F4	call    L09F4
+0886	40D7	mov     rc, a
+0887	61F3	call    L09F3
+0888	40D8	mov     rd, a
+0889	4750	mov     a, k2[0]
+088A	40D5	mov     ra, a
+088B	4751	mov     a, k2[1]
+088C	40D6	mov     rb, a
+088D	4757	mov     a, rc
+088E	43D5	addm    a, ra
+088F	4758	mov     a, rd
+0890	53D6	adcm    a, rb
+0891	4755	mov     a, ra
+0892	40D0	mov     k2[0], a
+0893	4756	mov     a, rb
+0894	40D1	mov     k2[1], a
+				;137	    }
+				;138	    k2 -= min; k2 -= max; k2 >>= 3;			//089D	4750	mov     a, k2[0]
+089E	40D5	mov     ra, a
+089F	4751	mov     a, k2[1]
+08A0	40D6	mov     rb, a
+08A1	4755	mov     a, ra
+08A2	426E	sub     a, min[0]
+08A3	40D5	mov     ra, a
+08A4	4756	mov     a, rb
+08A5	526F	sbc     a, min[1]
+08A6	40D6	mov     rb, a
+08A7	4755	mov     a, ra
+08A8	40D0	mov     k2[0], a
+08A9	4756	mov     a, rb
+08AA	40D1	mov     k2[1], a
+08AB	4750	mov     a, k2[0]
+08AC	40D5	mov     ra, a
+08AD	4751	mov     a, k2[1]
+08AE	40D6	mov     rb, a
+08AF	4755	mov     a, ra
+08B0	4270	sub     a, max[0]
+08B1	40D5	mov     ra, a
+08B2	4756	mov     a, rb
+08B3	5271	sbc     a, max[1]
+08B4	40D6	mov     rb, a
+08B5	4755	mov     a, ra
+08B6	40D0	mov     k2[0], a
+08B7	4756	mov     a, rb
+08B8	40D1	mov     k2[1], a
+08B9	4750	mov     a, k2[0]
+08BA	40D5	mov     ra, a
+08BB	4751	mov     a, k2[1]
+08BC	40D6	mov     rb, a
+08BD	0F03	mov     a, 3H
+				_LI2:
+08BE	340A	clr     C
+08BF	5BD6	rrc     rb
+08C0	5BD5	rrc     ra
+08C1	1785	sdz     ACC
+08C2	68BE	jmp     _LI2
+08C3	4755	mov     a, ra
+08C4	40D0	mov     k2[0], a
+08C5	4756	mov     a, rb
+08C6	40D1	mov     k2[1], a
+				;139	    
+				;140	///*******************************************************************************************/    
+				;141		for(i = 0;i < MAX_INDOOR_TMEP;i++)		//08C7	5F6D	clr     i[0]
+08C8	68EA	jmp     _L27
+				_L28:
+08E6	476D	mov     a, i[0]
+08E7	40D5	mov     ra, a
+08E8	5455	inca    ra
+08E9	40ED	mov     i[0], a
+				_L27:
+08EA	0F10	mov     a, 10H
+08EB	426D	sub     a, i[0]
+08EC	3C0A	sz      C
+08ED	68C9	jmp     _L30
+				;142		{
+				;143			if(k2 <= AllTempTab[i])
+				_L30:
+08C9	476D	mov     a, i[0]
+08CA	40D5	mov     ra, a
+08CB	5F56	clr     rb
+08CC	340A	clr     C
+08CD	5AD5	rlc     ra
+08CE	5AD6	rlc     rb
+08CF	0FC2	mov     a, C2H
+08D0	43D5	addm    a, ra
+08D1	0F80	mov     a, 80H
+08D2	53D6	adcm    a, rb
+08D3	4755	mov     a, ra
+08D4	0083	mov     MP1, a
+08D5	4756	mov     a, rb
+08D6	0081	mov     MP0, a
+08D7	61F4	call    L09F4
+08D8	40D7	mov     rc, a
+08D9	61F3	call    L09F3
+08DA	40D8	mov     rd, a
+08DB	4750	mov     a, k2[0]
+08DC	40D5	mov     ra, a
+08DD	4751	mov     a, k2[1]
+08DE	40D6	mov     rb, a
+08DF	4757	mov     a, rc
+08E0	4255	sub     a, ra
+08E1	4758	mov     a, rd
+08E2	5256	sbc     a, rb
+08E3	380A	snz     C
+08E4	68E6	jmp     _L28
+				;144			{			
+				;145				break;
+08E5	68EE	jmp     _L29
+				;146			}
+				;147		}
+				;148		MaxTempIndex = i + 8;					//				_L29:
+08EE	476D	mov     a, i[0]
+08EF	0B08	add     a, 8H
+08F0	40D5	mov     ra, a
+08F1	4755	mov     a, ra
+08F2	40CD	mov     MaxTempIndex[0], a
+				_L17:
+08F3	0003	ret
+				;149	}
+				;150	
+				;file E:\				;1	#include "base.h"
+				;2	#define EXTERN extern
+				;3	#include "Var.h"
+				;4	//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+				;5	typedef struct
+				;6	{
+				;7		u16 Min;
+				;8		u16 Max;
+				;9	} __TEMP;
+				;10	extern unsigned int PWM_VLAUE;
+				;11	extern unsigned int k;
+				;12	extern unsigned int k2;
+				;13	extern unsigned char adcsp_2;
+				;14	extern unsigned char adcsele_2; 
+				;15	/*****************************************************
+				;16	***************  Out = 0;	**************************
+				;17	***************  In = 1;	**************************
+				;18	******************************************************/
+				;19	
+				;20	void InitSys(void)		//   OUT = 0     IN = 1
+				;21	{
+				;22	// System clock setting
+				;23		_smod = 0b11100001;					// fsys=fH=8MHz; IDLE mode Disable
+				_InitSys:
+				_InitSys:
+				@dummy .SECTION 'CODE'
+00B9	0FE1	mov     a, E1H
+00BA	008B	mov     SMOD, a
+				;24		// Watchdog Timer Setting  
+				;25		_wdtc = 0b01010101;					// set WDT Timeout period= 2^16/fsub=2^16/32.768kHz=2sec; Enable WDT
+00BB	0F55	mov     a, 55H
+00BC	009A	mov     WDTC, a
+				;26	    _lvrc = 0b00110011; //2.55V
+00BD	0F33	mov     a, 33H
+00BE	009D	mov     LVRC, a
+				;27	    _cpc = 0x08;
+00BF	0F08	mov     a, 8H
+00C0	00BE	mov     CPC, a
+				;28	/****** buzzer ***************/    
+				;29	    _pcc0 = 0;
+00C1	3441	clr     PCC0
+				;30	    _pcpu0 = 1;
+00C2	3042	set     PCPU0
+				;31	    Buzz_OFF;
+00C3	3440	clr     PC0
+				;32	//*********** LED_IO *********************//    
+				;33	    _pcc1 = 0;
+00C4	34C1	clr     PCC1
+				;34	    _pcpu1 = 1;
+00C5	30C2	set     PCPU1
+				;35	    LED_3_GREEN_OFF;  
+00C6	30C0	set     PC1
+				;36	    _pcc2 = 0;
+00C7	3541	clr     PCC2
+				;37	    _pcpu2 = 1;
+00C8	3142	set     PCPU2
+				;38	    LED_3_BLU_OFF;   
+00C9	3140	set     PC2
+				;39	    _pac1 = 0;
+00CA	3495	clr     PAC1
+				;40	    _papu1 = 1;
+00CB	3096	set     PAPU1
+				;41	    LED_WHITE_1_OFF;
+00CC	3094	set     PA1
+				;42	    
+				;43	    _pac2 = 0;
+00CD	3515	clr     PAC2
+				;44	    _papu2 = 1;
+00CE	3116	set     PAPU2
+				;45		LED_WHITE_2_OFF;	
+00CF	3114	set     PA2
+				;46	
+				;47	    _pac7 = 0;
+00D0	3795	clr     PAC7
+				;48	    _papu7 = 1;
+00D1	3396	set     PAPU7
+				;49		LED_Breathe_OFF;
+00D2	3394	set     PA7
+				;50				
+				;51	    _pbc2 = 0;      
+00D3	3526	clr     PBC2
+				;52	    _pbpu2 = 1;
+00D4	3127	set     PBPU2
+				;53	    LED_3_RED_OFF;
+00D5	3125	set     PB2
+				;54	/********** Read Bat_status **************************************/
+				;55		_pbc0 = 1;      
+00D6	3026	set     PBC0
+				;56	    _pbpu0 = 0;
+00D7	3427	clr     PBPU0
+				;57	    /*Bat_Status = Bat_Satiation;*/
+				;58	/************ 				;59	    _pac5 = 0;
+00D8	3695	clr     PAC5
+				;60	    _papu5 = 1;
+00D9	3296	set     PAPU5
+				;61		MOTOR_OFF;	
+00DA	3694	clr     PA5
+				;62	    //******** Battery_AN5 ***************/
+				;63	    _acerl = 0;
+00DB	1F24	clr     ACERL
+				;64	    _acerl |= 0b00101000;	//********* PA4 && PA6 = AD00DC	0724	mov     a, ACERL
+00DD	40D5	mov     ra, a
+00DE	0F28	mov     a, 28H
+00DF	45D5	orm     a, ra
+00E0	4755	mov     a, ra
+00E1	00A4	mov     ACERL, a
+				;65	/*    _adcr0 = ADC_BATTERY;*/
+				;66	    _adcr0 = ADC_NTC;		//	01100E2	0F13	mov     a, 13H
+00E3	00A2	mov     ADCR0, a
+				;67	    _adcr1 = 0x06;			//  11000E4	0F06	mov     a, 6H
+00E5	00A3	mov     ADCR1, a
+				;68	    STAR_ADC();
+00E6	37A2	clr     START
+00E7	33A2	set     START
+00E8	37A2	clr     START
+				;69	/************** Open_Out_5V *****************************************/
+				;70		_pbc1 = 0;      
+00E9	34A6	clr     PBC1
+				;71		_pbpu1 = 0;
+00EA	34A7	clr     PBPU1
+				;72		Out_5V_IO_Close;
+00EB	30A6	set     PBC1
+				;73	/******************************************************************/
+				;74	//adc init   
+				;75	//********** KEY_IO  *****************************//
+				;76		_pac3 = 1;
+00EC	3195	set     PAC3
+				;77		_papu3 = 1;
+00ED	3196	set     PAPU3
+				;78		_pawu3 = 1;
+00EE	3197	set     PAWU3
+				;79		KEY = 1;
+00EF	3194	set     PA3
+				;80	//*********** Heat_Wire ***********************************//    
+				;81		_pbc2 = 0;
+00F0	3526	clr     PBC2
+				;82		_pbpu2 = 1;
+00F1	3127	set     PBPU2
+				;83		Heat_Wire_OFF;	  
+00F2	3414	clr     PA0
+00F3	0003	ret
+				;84	}
+				;85	
+				;86	void Ram_Init(void)
+				;87	{
+				;88		Forward_Value = 0;
+				_Ram_Init:
+				_Ram_Init:
+00F4	74A0	clr     maiFlagA[0].1
+				;89		Forward_Value_Flag = 0;
+00F5	7421	clr     maiFlagB[0].0
+				;90		Double_Click_Value = 0;	
+00F6	75A0	clr     maiFlagA[0].3
+				;91		Double_Click_Value_Flag = 0;
+00F7	74A1	clr     maiFlagB[0].1
+				;92		Key_Forward_Long_val = 0;
+00F8	7620	clr     maiFlagA[0].4
+				;93		Key_Forward_Long_val_Flag = 0;
+00F9	7521	clr     maiFlagB[0].2
+				;94		Power_ON_OFF_flag = 0;
+00FA	77A0	clr     maiFlagA[0].7
+				;95		WorkMode = READY_MODE;
+00FB	5F2F	clr     WorkMode[0]
+				;96		
+				;97		H_45C_Flag = 0;
+00FC	7423	clr     LEDH[0].0
+				;98		Breathe_Flag = 0;
+00FD	7422	clr     LEDG[0].0
+				;99		Buzzer.Times = 0;
+00FE	5F25	clr     Buzzer[0]
+				;100		Buzz_OFF;
+00FF	3440	clr     PC0
+				;101		TaskKeyRdy = false;
+0100	76A2	clr     LEDG[0].5
+				;102		Out_5V_IO_Close;
+0101	30A6	set     PBC1
+				;103		k = 0;
+0102	5F4E	clr     k[0]
+0103	5F4F	clr     k[1]
+				;104		k2 = 0;
+0104	5F50	clr     k2[0]
+0105	5F51	clr     k2[1]
+				;105		
+				;106		TempSta = DOWN_22;
+0106	5F30	clr     TempSta[0]
+				;107		Close_5V_Flag = false;
+0107	76A1	clr     maiFlagB[0].5
+				;108		Output5V.Times = 0;
+0108	5F2A	clr     Output5V[0]
+				;109		DCInFlag = false;
+0109	7721	clr     maiFlagB[0].6
+				;110		NormalWinterFlag = false;
+010A	7622	clr     LEDG[0].4
+				;111		ntc_val = 0;
+010B	5F31	clr     ntc_val[0]
+010C	5F32	clr     ntc_val[1]
+				;112		Open5V200msCnt = 0;	
+010D	5F33	clr     Open5V200msCnt[0]
+010E	5F34	clr     Open5V200msCnt[1]
+				;113		direc_flag = true;			//010F	7320	set     maiFlagA[0].6
+				;114		PreHeatFlag = false;		//0110	7420	clr     maiFlagA[0].0
+				;115		SleepCnt = 0;
+0111	5F24	clr     SleepCnt[0]
+				;116		SumOfEdge = 0;
+0112	5F36	clr     SumOfEdge[0]
+0113	0003	ret
+				;117	}
+				;file E:\				;1	/**************************************************************************/
+				;2	
+				;3	#include "base.h"
+				;4	#define EXTERN extern
+				;5	#include "Var.h"
+				;6	
+				;7	/**********************************/
+				;8	volatile static unsigned char Forward_Buf __attribute__ ((at(0x1dd)));
+				;9	volatile static unsigned char Pre_Forward_Buf __attribute__ ((at(0x1de)));
+				;10	volatile static unsigned char Key_Forward_Time __attribute__ ((at(0x1df)));
+				;11	volatile static unsigned int Key_Forward_Delay __attribute__ ((at(0x1e0)));
+				;12	volatile static unsigned int Key_Forward_Ms __attribute__ ((at(0x1e2)));
+				;13	volatile static unsigned char Key_Forward_Mode __attribute__ ((at(0x1e4)));
+				;14	volatile static unsigned int Double_Click_timer __attribute__ ((at(0x1e5)));
+				;15	volatile static unsigned char Change_Key_Mode __attribute__ ((at(0x1e7)));
+				;16	volatile static unsigned int Key_LongPre_timer __attribute__ ((at(0x1e8)));
+				;17	
+				;18	/*********************************/
+				;19	/**********************************/
+				;20	extern unsigned char Key_ms;
+				;21	
+				;22	extern unsigned char Time_500MS_Cnt;
+				;23	extern unsigned char Time_1S_Cnt;
+				;24	extern u8 Duty_percentage;
+				;25	extern unsigned int PWM_VLAUE;
+				;26	extern volatile unsigned int Time_200MS_Cnt;
+				;27	
+				;28	extern u8 signal_hz_1s;
+				;29	/*******************************/
+				;30	#define KEY_LONG	150
+				;31	#define MAX_EFFECT_TIME	200	//2S
+				;32	/********* 				;33	void GetKey(void)
+				;34	{
+				;35		if(TaskKeyRdy)
+				_GetKey:
+				_GetKey:
+034C	4722	mov     a, LEDG[0]
+034D	40D5	mov     ra, a
+034E	0F20	mov     a, 20H
+034F	46D5	andm    a, ra
+0350	50D5	sz      ra
+0351	2B53	jmp     _LI1
+0352	2CC6	jmp     _L2
+				;36		{
+				;37			TaskKeyRdy = false;	
+				_LI1:
+0353	76A2	clr     LEDG[0].5
+				;38	/************ Forward Key *************************************************/		
+				;39			if(KEY == 0) 
+0354	0714	mov     a, PA
+0355	40D5	mov     ra, a
+0356	0F08	mov     a, 8H
+0357	46D5	andm    a, ra
+0358	50D5	sz      ra
+0359	2B63	jmp     _L3
+				;40			{
+				;41				Forward_Buf=1;	
+035A	0FDD	mov     a, DDH
+035B	0083	mov     MP1, a
+035C	0F01	mov     a, 1H
+035D	0081	mov     MP0, a
+035E	0701	mov     a, MP0
+035F	0084	mov     BP, a
+0360	0F01	mov     a, 1H
+0361	0082	mov     [02H], a
+0362	2B6B	jmp     _L4
+				;42			}
+				;43			else 
+				;44			{
+				;45				Forward_Buf = 0;		
+				_L3:
+0363	0FDD	mov     a, DDH
+0364	0083	mov     MP1, a
+0365	0F01	mov     a, 1H
+0366	0081	mov     MP0, a
+0367	0701	mov     a, MP0
+0368	0084	mov     BP, a
+0369	0F00	mov     a, 0H
+036A	0082	mov     [02H], a
+				;46			}
+				;47			/*********** 				;48			if(Forward_Buf != Pre_Forward_Buf)
+				_L4:
+036B	0FDD	mov     a, DDH
+036C	0083	mov     MP1, a
+036D	0F01	mov     a, 1H
+036E	0081	mov     MP0, a
+036F	0701	mov     a, MP0
+0370	0084	mov     BP, a
+0371	0702	mov     a, [02H]
+0372	40D6	mov     rb, a
+0373	0FDE	mov     a, DEH
+0374	0083	mov     MP1, a
+0375	0F01	mov     a, 1H
+0376	0081	mov     MP0, a
+0377	0701	mov     a, MP0
+0378	0084	mov     BP, a
+0379	0702	mov     a, [02H]
+037A	40D5	mov     ra, a
+037B	4756	mov     a, rb
+037C	4255	sub     a, ra
+037D	3D0A	sz      Z
+037E	2BCF	jmp     _L5
+				;49			{
+				;50				Key_Forward_Time++;
+037F	0FDF	mov     a, DFH
+0380	0083	mov     MP1, a
+0381	0F01	mov     a, 1H
+0382	0081	mov     MP0, a
+0383	0701	mov     a, MP0
+0384	0084	mov     BP, a
+0385	0702	mov     a, [02H]
+0386	40D5	mov     ra, a
+0387	54D5	inc     ra
+0388	0FDF	mov     a, DFH
+0389	0083	mov     MP1, a
+038A	0F01	mov     a, 1H
+038B	0081	mov     MP0, a
+038C	0701	mov     a, MP0
+038D	0084	mov     BP, a
+038E	4755	mov     a, ra
+038F	0082	mov     [02H], a
+				;51				if( Key_Forward_Time > 5)
+0390	0FDF	mov     a, DFH
+0391	0083	mov     MP1, a
+0392	0F01	mov     a, 1H
+0393	0081	mov     MP0, a
+0394	0701	mov     a, MP0
+0395	0084	mov     BP, a
+0396	0702	mov     a, [02H]
+0397	40D5	mov     ra, a
+0398	0F05	mov     a, 5H
+0399	4255	sub     a, ra
+039A	3C0A	sz      C
+039B	2CC6	jmp     _L2
+				;52				{
+				;53					if((Forward_Buf == 0)&&(Key_longPre_cut_click == 0))
+039C	0FDD	mov     a, DDH
+039D	0083	mov     MP1, a
+039E	0F01	mov     a, 1H
+039F	0081	mov     MP0, a
+03A0	0701	mov     a, MP0
+03A1	0084	mov     BP, a
+03A2	0702	mov     a, [02H]
+03A3	40D5	mov     ra, a
+03A4	50D5	sz      ra
+03A5	2BBE	jmp     _L7
+03A6	4720	mov     a, maiFlagA[0]
+03A7	40D5	mov     ra, a
+03A8	0F04	mov     a, 4H
+03A9	46D5	andm    a, ra
+03AA	50D5	sz      ra
+03AB	2BBE	jmp     _L7
+				;54					{	
+				;55						Change_Key_flag = 1;														
+03AC	72A0	set     maiFlagA[0].5
+				;56						Change_Key_Mode++;
+03AD	0FE7	mov     a, E7H
+03AE	0083	mov     MP1, a
+03AF	0F01	mov     a, 1H
+03B0	0081	mov     MP0, a
+03B1	0701	mov     a, MP0
+03B2	0084	mov     BP, a
+03B3	0702	mov     a, [02H]
+03B4	40D5	mov     ra, a
+03B5	54D5	inc     ra
+03B6	0FE7	mov     a, E7H
+03B7	0083	mov     MP1, a
+03B8	0F01	mov     a, 1H
+03B9	0081	mov     MP0, a
+03BA	0701	mov     a, MP0
+03BB	0084	mov     BP, a
+03BC	4755	mov     a, ra
+03BD	0082	mov     [02H], a
+				;57											
+				;58					}
+				;59				/********************************************************************/	
+				;60					Pre_Forward_Buf = Forward_Buf;
+				_L7:
+03BE	0FDD	mov     a, DDH
+03BF	0083	mov     MP1, a
+03C0	0F01	mov     a, 1H
+03C1	0081	mov     MP0, a
+03C2	0701	mov     a, MP0
+03C3	0084	mov     BP, a
+03C4	0702	mov     a, [02H]
+03C5	40D5	mov     ra, a
+03C6	0FDE	mov     a, DEH
+03C7	0083	mov     MP1, a
+03C8	0F01	mov     a, 1H
+03C9	0081	mov     MP0, a
+03CA	0701	mov     a, MP0
+03CB	0084	mov     BP, a
+03CC	4755	mov     a, ra
+03CD	0082	mov     [02H], a
+03CE	2CC6	jmp     _L2
+				;61				}
+				;62			}
+				;63			else 
+				;64			{
+				;65				/********************* Double_Click *******************************************/
+				;66				if((Double_Click_timer > MAX_EFFECT_TIME)) 
+				_L5:
+03CF	0FE5	mov     a, E5H
+03D0	0083	mov     MP1, a
+03D1	0F01	mov     a, 1H
+03D2	0081	mov     MP0, a
+03D3	0701	mov     a, MP0
+03D4	0084	mov     BP, a
+03D5	0702	mov     a, [02H]
+03D6	40D5	mov     ra, a
+03D7	1483	inc     MP1
+03D8	0702	mov     a, [02H]
+03D9	40D6	mov     rb, a
+03DA	0FC8	mov     a, C8H
+03DB	4255	sub     a, ra
+03DC	0F00	mov     a, 0H
+03DD	5256	sbc     a, rb
+03DE	3C0A	sz      C
+03DF	2BE1	jmp     _L8
+				;67						Change_Key_flag = 0;
+03E0	76A0	clr     maiFlagA[0].5
+				;68				if((Change_Key_flag == 1)&&(Double_Click_timer <= MAX_EFFECT_TIME))		
+				_L8:
+03E1	4720	mov     a, maiFlagA[0]
+03E2	40D5	mov     ra, a
+03E3	0F20	mov     a, 20H
+03E4	46D5	andm    a, ra
+03E5	50D5	sz      ra
+03E6	2BE8	jmp     _LI2
+03E7	2C34	jmp     _L9
+				_LI2:
+03E8	0FE5	mov     a, E5H
+03E9	0083	mov     MP1, a
+03EA	0F01	mov     a, 1H
+03EB	0081	mov     MP0, a
+03EC	0701	mov     a, MP0
+03ED	0084	mov     BP, a
+03EE	0702	mov     a, [02H]
+03EF	40D5	mov     ra, a
+03F0	1483	inc     MP1
+03F1	0702	mov     a, [02H]
+03F2	40D6	mov     rb, a
+03F3	0FC8	mov     a, C8H
+03F4	4255	sub     a, ra
+03F5	0F00	mov     a, 0H
+03F6	5256	sbc     a, rb
+03F7	380A	snz     C
+03F8	2C34	jmp     _L9
+				;69				{
+				;70					Double_Click_timer++;
+03F9	0FE5	mov     a, E5H
+03FA	0083	mov     MP1, a
+03FB	0F01	mov     a, 1H
+03FC	0081	mov     MP0, a
+03FD	0701	mov     a, MP0
+03FE	0084	mov     BP, a
+03FF	0702	mov     a, [02H]
+0400	40D5	mov     ra, a
+0401	1483	inc     MP1
+0402	0702	mov     a, [02H]
+0403	40D6	mov     rb, a
+0404	54D5	inc     ra
+0405	3D0A	sz      Z
+0406	54D6	inc     rb
+0407	0FE5	mov     a, E5H
+0408	0083	mov     MP1, a
+0409	0F01	mov     a, 1H
+040A	0081	mov     MP0, a
+040B	0701	mov     a, MP0
+040C	0084	mov     BP, a
+040D	4755	mov     a, ra
+040E	0082	mov     [02H], a
+040F	1483	inc     MP1
+0410	4756	mov     a, rb
+0411	0082	mov     [02H], a
+				;71					if(Change_Key_Mode == 3)
+0412	0FE7	mov     a, E7H
+0413	0083	mov     MP1, a
+0414	0F01	mov     a, 1H
+0415	0081	mov     MP0, a
+0416	0701	mov     a, MP0
+0417	0084	mov     BP, a
+0418	0702	mov     a, [02H]
+0419	40D5	mov     ra, a
+041A	4755	mov     a, ra
+041B	0A03	sub     a, 3H
+041C	390A	snz     Z
+041D	2C33	jmp     _L10
+0432	2C48	jmp     _L11
+				_L10:
+0433	2C48	jmp     _L11
+				;72					{
+				;73						Change_Key_flag = 0;
+041E	76A0	clr     maiFlagA[0].5
+				;74						Change_Key_Mode = 0;
+041F	0FE7	mov     a, E7H
+0420	0083	mov     MP1, a
+0421	0F01	mov     a, 1H
+0422	0081	mov     MP0, a
+0423	0701	mov     a, MP0
+0424	0084	mov     BP, a
+0425	0F00	mov     a, 0H
+0426	0082	mov     [02H], a
+				;75						Double_Click_timer = 0;
+0427	0FE5	mov     a, E5H
+0428	0083	mov     MP1, a
+0429	0F01	mov     a, 1H
+042A	0081	mov     MP0, a
+042B	0701	mov     a, MP0
+042C	0084	mov     BP, a
+042D	1F02	clr     [02H]
+042E	1483	inc     MP1
+042F	1F02	clr     [02H]
+				;76						Forward_Value = 0;
+0430	74A0	clr     maiFlagA[0].1
+				;77						Double_Click_Value = 1;	
+0431	71A0	set     maiFlagA[0].3
+				;78					}
+				;79				}
+				;80				else
+				;81				{
+				;82					Change_Key_flag = 0;
+				_L9:
+0434	76A0	clr     maiFlagA[0].5
+				;83					Change_Key_Mode = 0;
+0435	0FE7	mov     a, E7H
+0436	0083	mov     MP1, a
+0437	0F01	mov     a, 1H
+0438	0081	mov     MP0, a
+0439	0701	mov     a, MP0
+043A	0084	mov     BP, a
+043B	0F00	mov     a, 0H
+043C	0082	mov     [02H], a
+				;84					Double_Click_timer = 0;
+043D	0FE5	mov     a, E5H
+043E	0083	mov     MP1, a
+043F	0F01	mov     a, 1H
+0440	0081	mov     MP0, a
+0441	0701	mov     a, MP0
+0442	0084	mov     BP, a
+0443	1F02	clr     [02H]
+0444	1483	inc     MP1
+0445	1F02	clr     [02H]
+				;85					Forward_Value = 0;
+0446	74A0	clr     maiFlagA[0].1
+				;86					Double_Click_Value = 0;
+0447	75A0	clr     maiFlagA[0].3
+				;87				}
+				;88				/*******************************************************************************************/			
+				;89			  /********** 				;90				Key_Forward_Time = 0;
+				_L11:
+0448	0FDF	mov     a, DFH
+0449	0083	mov     MP1, a
+044A	0F01	mov     a, 1H
+044B	0081	mov     MP0, a
+044C	0701	mov     a, MP0
+044D	0084	mov     BP, a
+044E	0F00	mov     a, 0H
+044F	0082	mov     [02H], a
+				;91				if(Forward_Buf == 1)
+0450	0FDD	mov     a, DDH
+0451	0083	mov     MP1, a
+0452	0F01	mov     a, 1H
+0453	0081	mov     MP0, a
+0454	0701	mov     a, MP0
+0455	0084	mov     BP, a
+0456	0702	mov     a, [02H]
+0457	40D5	mov     ra, a
+0458	5755	sdza    ra
+0459	2CB3	jmp     _L12
+				;92				{
+				;93					if(Key_Forward_Delay <= KEY_LONG)	// 3s
+045A	0FE0	mov     a, E0H
+045B	0083	mov     MP1, a
+045C	0F01	mov     a, 1H
+045D	0081	mov     MP0, a
+045E	0701	mov     a, MP0
+045F	0084	mov     BP, a
+0460	0702	mov     a, [02H]
+0461	40D5	mov     ra, a
+0462	1483	inc     MP1
+0463	0702	mov     a, [02H]
+0464	40D6	mov     rb, a
+0465	0F96	mov     a, 96H
+0466	4255	sub     a, ra
+0467	0F00	mov     a, 0H
+0468	5256	sbc     a, rb
+0469	380A	snz     C
+046A	2C99	jmp     _L13
+				;94					{
+				;95						Key_Forward_Delay++;
+046B	0FE0	mov     a, E0H
+046C	0083	mov     MP1, a
+046D	0F01	mov     a, 1H
+046E	0081	mov     MP0, a
+046F	0701	mov     a, MP0
+0470	0084	mov     BP, a
+0471	0702	mov     a, [02H]
+0472	40D5	mov     ra, a
+0473	1483	inc     MP1
+0474	0702	mov     a, [02H]
+0475	40D6	mov     rb, a
+0476	54D5	inc     ra
+0477	3D0A	sz      Z
+0478	54D6	inc     rb
+0479	0FE0	mov     a, E0H
+047A	0083	mov     MP1, a
+047B	0F01	mov     a, 1H
+047C	0081	mov     MP0, a
+047D	0701	mov     a, MP0
+047E	0084	mov     BP, a
+047F	4755	mov     a, ra
+0480	0082	mov     [02H], a
+0481	1483	inc     MP1
+0482	4756	mov     a, rb
+0483	0082	mov     [02H], a
+				;96						if(Key_Forward_Delay == KEY_LONG)
+0484	0FE0	mov     a, E0H
+0485	0083	mov     MP1, a
+0486	0F01	mov     a, 1H
+0487	0081	mov     MP0, a
+0488	0701	mov     a, MP0
+0489	0084	mov     BP, a
+048A	0702	mov     a, [02H]
+048B	40D5	mov     ra, a
+048C	1483	inc     MP1
+048D	0702	mov     a, [02H]
+048E	40D6	mov     rb, a
+048F	4755	mov     a, ra
+0490	0C96	xor     a, 96H
+0491	4556	or      a, rb
+0492	390A	snz     Z
+0493	2CC6	jmp     _L2
+				;97						{
+				;98							Key_longPre_cut_click = 1;
+0494	7120	set     maiFlagA[0].2
+				;99							Double_Click_Value = 0;
+0495	75A0	clr     maiFlagA[0].3
+				;100							Forward_Value = 0;
+0496	74A0	clr     maiFlagA[0].1
+				;101							Key_Forward_Long_val = 1;	
+0497	7220	set     maiFlagA[0].4
+0498	2CC6	jmp     _L2
+				;102						}
+				;103					}				
+				;104					/******************************/
+				;105					else Key_Forward_Ms++;
+				_L13:
+0499	0FE2	mov     a, E2H
+049A	0083	mov     MP1, a
+049B	0F01	mov     a, 1H
+049C	0081	mov     MP0, a
+049D	0701	mov     a, MP0
+049E	0084	mov     BP, a
+049F	0702	mov     a, [02H]
+04A0	40D5	mov     ra, a
+04A1	1483	inc     MP1
+04A2	0702	mov     a, [02H]
+04A3	40D6	mov     rb, a
+04A4	54D5	inc     ra
+04A5	3D0A	sz      Z
+04A6	54D6	inc     rb
+04A7	0FE2	mov     a, E2H
+04A8	0083	mov     MP1, a
+04A9	0F01	mov     a, 1H
+04AA	0081	mov     MP0, a
+04AB	0701	mov     a, MP0
+04AC	0084	mov     BP, a
+04AD	4755	mov     a, ra
+04AE	0082	mov     [02H], a
+04AF	1483	inc     MP1
+04B0	4756	mov     a, rb
+04B1	0082	mov     [02H], a
+04B2	2CC6	jmp     _L2
+				;106				}
+				;107				else 
+				;108				{
+				;109					Key_longPre_cut_click = 0;
+				_L12:
+04B3	7520	clr     maiFlagA[0].2
+				;110					Key_Forward_Ms = 0;
+04B4	0FE2	mov     a, E2H
+04B5	0083	mov     MP1, a
+04B6	0F01	mov     a, 1H
+04B7	0081	mov     MP0, a
+04B8	0701	mov     a, MP0
+04B9	0084	mov     BP, a
+04BA	1F02	clr     [02H]
+04BB	1483	inc     MP1
+04BC	1F02	clr     [02H]
+				;111					Key_Forward_Delay = 0;
+04BD	0FE0	mov     a, E0H
+04BE	0083	mov     MP1, a
+04BF	0F01	mov     a, 1H
+04C0	0081	mov     MP0, a
+04C1	0701	mov     a, MP0
+04C2	0084	mov     BP, a
+04C3	1F02	clr     [02H]
+04C4	1483	inc     MP1
+04C5	1F02	clr     [02H]
+				;112				}
+				;113			}					
+				;114	/*********************************************************************/		
+				;115		}
+				;116	/************ 				;117	/************ One_Press *************************************/
+				;118		if( Forward_Value == 1)  // Click
+				_L2:
+04C6	4720	mov     a, maiFlagA[0]
+04C7	40D5	mov     ra, a
+04C8	0F02	mov     a, 2H
+04C9	46D5	andm    a, ra
+04CA	50D5	sz      ra
+04CB	2CCD	jmp     _LI3
+04CC	2CD2	jmp     _L16
+				;119		 {
+				;120		 	Forward_Value = 0;
+				_LI3:
+04CD	74A0	clr     maiFlagA[0].1
+				;121		 	Double_Click_Value_Flag = 0;
+04CE	74A1	clr     maiFlagB[0].1
+				;122			Key_Forward_Long_val_Flag = 0;
+04CF	7521	clr     maiFlagB[0].2
+				;123			Forward_Value_Flag = 1;
+04D0	7021	set     maiFlagB[0].0
+04D1	2CE9	jmp     _L1
+				;124		 }
+				;125		 else
+				;126	/***********************************************************/
+				;127		if( Key_Forward_Long_val == 1)  // Press_Long
+				_L16:
+04D2	4720	mov     a, maiFlagA[0]
+04D3	40D5	mov     ra, a
+04D4	0F10	mov     a, 10H
+04D5	46D5	andm    a, ra
+04D6	50D5	sz      ra
+04D7	2CD9	jmp     _LI4
+04D8	2CDE	jmp     _L18
+				;128		 {		
+				;129			Key_Forward_Long_val = 0;
+				_LI4:
+04D9	7620	clr     maiFlagA[0].4
+				;130			Forward_Value_Flag = 0;
+04DA	7421	clr     maiFlagB[0].0
+				;131			Double_Click_Value_Flag = 0;
+04DB	74A1	clr     maiFlagB[0].1
+				;132			Key_Forward_Long_val_Flag = 1;
+04DC	7121	set     maiFlagB[0].2
+04DD	2CE9	jmp     _L1
+				;133		 }
+				;134		 else
+				;135	/************** Double_Click ***********************************/
+				;136		if(Double_Click_Value == 1)		// Double Click
+				_L18:
+04DE	4720	mov     a, maiFlagA[0]
+04DF	40D5	mov     ra, a
+04E0	0F08	mov     a, 8H
+04E1	46D5	andm    a, ra
+04E2	50D5	sz      ra
+04E3	2CE5	jmp     _LI5
+04E4	2CE9	jmp     _L1
+				;137		{
+				;138			Double_Click_Value = 0;
+				_LI5:
+04E5	75A0	clr     maiFlagA[0].3
+				;139			Forward_Value_Flag = 0;
+04E6	7421	clr     maiFlagB[0].0
+				;140			Key_Forward_Long_val_Flag = 0;
+04E7	7521	clr     maiFlagB[0].2
+				;141			Double_Click_Value_Flag = 1;		
+04E8	70A1	set     maiFlagB[0].1
+				_L1:
+04E9	0003	ret
+				;142		}	
+				;143	//	if(Bat_Power__flag == 1)
+				;144	//	{
+				;145	//		Key_Forward_Long_val = 0;
+				;146	//	}
+				;147	}
+				;file E:\				;1	#include "base.h"
+				;2	#define EXTERN extern
+				;3	#include "Var.h"
+				;4	
+				;5	/************* BUZZ 				;6	
+				;7	void Open5V(void)
+				;8	{
+				;9		Output5V.Times = 1;
+				_Open5V:
+				_Open5V:
+04EA	0F01	mov     a, 1H
+04EB	40AA	mov     Output5V[0], a
+				;10		Output5V.OnCnt = OPEN5V_ON_TIME;
+04EC	0F3C	mov     a, 3CH
+04ED	40AB	mov     Output5V[1], a
+04EE	5F2C	clr     Output5V[2]
+				;11		Output5V.OffCnt = 0;	
+04EF	5F2D	clr     Output5V[3]
+04F0	5F2E	clr     Output5V[4]
+04F1	0003	ret
+				;12	}
+				;13	
+				;14	void Close5V(void)
+				;15	{
+				;16		Output5V.Times = 2;
+				_Close5V:
+				_Close5V:
+04F2	0F02	mov     a, 2H
+04F3	40AA	mov     Output5V[0], a
+				;17		Output5V.OnCnt = OPEN5V_ON_TIME;
+04F4	0F3C	mov     a, 3CH
+04F5	40AB	mov     Output5V[1], a
+04F6	5F2C	clr     Output5V[2]
+				;18		Output5V.OffCnt = OPEN5V_OFF_TIME;	
+04F7	0F3C	mov     a, 3CH
+04F8	40AD	mov     Output5V[3], a
+04F9	5F2E	clr     Output5V[4]
+04FA	0003	ret
+				;19	}
+				;20	
+				;21	/*************************************************************/
+				;22	void KeyBuzzer(char Buzz_1)	
+				;23	{
+				_KeyBuzzer:
+				_KeyBuzzer:
+04FB	40ED	mov     Buzz_1[0], a
+				;24		switch(Buzz_1)
+04FC	476D	mov     a, Buzz_1[0]
+04FD	40D5	mov     ra, a
+04FE	5F56	clr     rb
+04FF	3F85	sz      ACC.7
+0500	5FD6	set     rb
+0501	4755	mov     a, ra
+0502	0C01	xor     a, 1H
+0503	4556	or      a, rb
+0504	3D0A	sz      Z
+0505	2D16	jmp     L0516
+0506	4755	mov     a, ra
+0507	0C02	xor     a, 2H
+0508	4556	or      a, rb
+0509	3D0A	sz      Z
+050A	2D1F	jmp     L051F
+050B	4755	mov     a, ra
+050C	0C03	xor     a, 3H
+050D	4556	or      a, rb
+050E	3D0A	sz      Z
+050F	2D28	jmp     L0528
+0510	4755	mov     a, ra
+0511	0C04	xor     a, 4H
+0512	4556	or      a, rb
+0513	3D0A	sz      Z
+0514	2D31	jmp     L0531
+				;25		{		
+				;26			case 1:		//  				;27				Buzzer.Times = 1;
+				L0516:
+0516	0F01	mov     a, 1H
+0517	40A5	mov     Buzzer[0], a
+				;28				Buzzer.OnCnt = 15;
+0518	0F0F	mov     a, FH
+0519	40A6	mov     Buzzer[1], a
+051A	5F27	clr     Buzzer[2]
+				;29				Buzzer.OffCnt = 8;
+051B	0F08	mov     a, 8H
+051C	40A8	mov     Buzzer[3], a
+051D	5F29	clr     Buzzer[4]
+				;30				break;
+051E	2D39	jmp     L0539
+				;31			case 2:		// 				;32				Buzzer.Times = 2;
+				L051F:
+051F	0F02	mov     a, 2H
+0520	40A5	mov     Buzzer[0], a
+				;33				Buzzer.OnCnt = 13;
+0521	0F0D	mov     a, DH
+0522	40A6	mov     Buzzer[1], a
+0523	5F27	clr     Buzzer[2]
+				;34				Buzzer.OffCnt = 8;
+0524	0F08	mov     a, 8H
+0525	40A8	mov     Buzzer[3], a
+0526	5F29	clr     Buzzer[4]
+				;35				break;
+0527	2D39	jmp     L0539
+				;36			case 3:		// 				;37				Buzzer.Times = 1;
+				L0528:
+0528	0F01	mov     a, 1H
+0529	40A5	mov     Buzzer[0], a
+				;38				Buzzer.OnCnt = 20;
+052A	0F14	mov     a, 14H
+052B	40A6	mov     Buzzer[1], a
+052C	5F27	clr     Buzzer[2]
+				;39				Buzzer.OffCnt = 10;
+052D	0F0A	mov     a, AH
+052E	40A8	mov     Buzzer[3], a
+052F	5F29	clr     Buzzer[4]
+				;40				break;
+0530	2D39	jmp     L0539
+				;41			case 4:		// 				;42				Buzzer.Times = 3;
+				L0531:
+0531	0F03	mov     a, 3H
+0532	40A5	mov     Buzzer[0], a
+				;43				Buzzer.OnCnt = 10;
+0533	0F0A	mov     a, AH
+0534	40A6	mov     Buzzer[1], a
+0535	5F27	clr     Buzzer[2]
+				;44				Buzzer.OffCnt = 8;
+0536	0F08	mov     a, 8H
+0537	40A8	mov     Buzzer[3], a
+0538	5F29	clr     Buzzer[4]
+				;45				break;
+				L0539:
+0539	0003	ret
+				;46			default:
+				;47				
+				;48				break;
+0515	2D39	jmp     L0539
+				;49		}
+				;50	}
+				;51	
+				;52	void TaskBuzzer(void)
+				;53	{
+				;54		if(TaskBuzzerRdy)
+				_TaskBuzzer:
+				_TaskBuzzer:
+053A	4722	mov     a, LEDG[0]
+053B	40D5	mov     ra, a
+053C	0F08	mov     a, 8H
+053D	46D5	andm    a, ra
+053E	50D5	sz      ra
+053F	2D41	jmp     _LI1
+0540	2DDA	jmp     _L10
+				;55		{
+				;56			TaskBuzzerRdy = false;
+				_LI1:
+0541	75A2	clr     LEDG[0].3
+				;57			if(Buzzer.Times > 0)	//0542	4725	mov     a, Buzzer[0]
+0543	40D5	mov     ra, a
+0544	7FD5	sz      ra.7
+0545	2D88	jmp     _L12
+0546	50D5	sz      ra
+0547	2D49	jmp     _LI2
+0548	2D88	jmp     _L12
+				;58			{
+				;59				if(Buzzer.OnCnt-- > 0)
+				_LI2:
+0549	4726	mov     a, Buzzer[1]
+054A	40D5	mov     ra, a
+054B	4727	mov     a, Buzzer[2]
+054C	40D6	mov     rb, a
+054D	0FFF	mov     a, FFH
+054E	4355	add     a, ra
+054F	40D7	mov     rc, a
+0550	0FFF	mov     a, FFH
+0551	5356	adc     a, rb
+0552	40D8	mov     rd, a
+0553	4757	mov     a, rc
+0554	40A6	mov     Buzzer[1], a
+0555	4758	mov     a, rd
+0556	40A7	mov     Buzzer[2], a
+0557	7FD6	sz      rb.7
+0558	2D5F	jmp     _L13
+0559	4755	mov     a, ra
+055A	4556	or      a, rb
+055B	3D0A	sz      Z
+055C	2D5F	jmp     _L13
+				;60				{
+				;61					Buzz_ON;
+055D	3040	set     PC0
+055E	2D92	jmp     _L16
+				;62					//LED_3_GREEN_REVERSE;
+				;63				}
+				;64				else
+				;65				{
+				;66					if(Buzzer.OffCnt-- > 0)
+				_L13:
+055F	4728	mov     a, Buzzer[3]
+0560	40D5	mov     ra, a
+0561	4729	mov     a, Buzzer[4]
+0562	40D6	mov     rb, a
+0563	0FFF	mov     a, FFH
+0564	4355	add     a, ra
+0565	40D7	mov     rc, a
+0566	0FFF	mov     a, FFH
+0567	5356	adc     a, rb
+0568	40D8	mov     rd, a
+0569	4757	mov     a, rc
+056A	40A8	mov     Buzzer[3], a
+056B	4758	mov     a, rd
+056C	40A9	mov     Buzzer[4], a
+056D	7FD6	sz      rb.7
+056E	2D75	jmp     _L15
+056F	4755	mov     a, ra
+0570	4556	or      a, rb
+0571	3D0A	sz      Z
+0572	2D75	jmp     _L15
+				;67					{
+				;68						Buzz_OFF;
+0573	3440	clr     PC0
+0574	2D92	jmp     _L16
+				;69					}
+				;70					else
+				;71					{
+				;72						if(Buzzer.Times > 0)
+				_L15:
+0575	4725	mov     a, Buzzer[0]
+0576	40D5	mov     ra, a
+0577	7FD5	sz      ra.7
+0578	2D92	jmp     _L16
+0579	50D5	sz      ra
+057A	2D7C	jmp     _LI3
+057B	2D92	jmp     _L16
+				;73						{
+				;74							Buzzer.Times--;
+				_LI3:
+057C	4725	mov     a, Buzzer[0]
+057D	40D5	mov     ra, a
+057E	55D5	dec     ra
+057F	4755	mov     a, ra
+0580	40A5	mov     Buzzer[0], a
+				;75							Buzzer.OnCnt = BUZZER_ON_TIME;
+0581	0F0F	mov     a, FH
+0582	40A6	mov     Buzzer[1], a
+0583	5F27	clr     Buzzer[2]
+				;76							Buzzer.OffCnt = BUZZER_OFF_TIME;
+0584	0F08	mov     a, 8H
+0585	40A8	mov     Buzzer[3], a
+0586	5F29	clr     Buzzer[4]
+0587	2D92	jmp     _L16
+				;77						}				
+				;78					}
+				;79				}		
+				;80			}
+				;81			else
+				;82			{		
+				;83				Buzz_OFF;
+				_L12:
+0588	3440	clr     PC0
+				;84				if(SleepPrepareFlag)
+0589	4721	mov     a, maiFlagB[0]
+058A	40D5	mov     ra, a
+058B	0F80	mov     a, 80H
+058C	46D5	andm    a, ra
+058D	50D5	sz      ra
+058E	2D90	jmp     _LI4
+058F	2D92	jmp     _L16
+				;85				{
+				;86					SleepPrepareFlag = false;
+				_LI4:
+0590	77A1	clr     maiFlagB[0].7
+				;87					SleepModeFlag = true;
+0591	71A1	set     maiFlagB[0].3
+				;88				}
+				;89			}
+				;90			
+				;91			if(Output5V.Times > 0)	//5v				_L16:
+0592	472A	mov     a, Output5V[0]
+0593	40D5	mov     ra, a
+0594	7FD5	sz      ra.7
+0595	2DD9	jmp     _L17
+0596	50D5	sz      ra
+0597	2D99	jmp     _LI5
+0598	2DD9	jmp     _L17
+				;92			{
+				;93				if(Output5V.OnCnt-- > 0)
+				_LI5:
+0599	472B	mov     a, Output5V[1]
+059A	40D5	mov     ra, a
+059B	472C	mov     a, Output5V[2]
+059C	40D6	mov     rb, a
+059D	0FFF	mov     a, FFH
+059E	4355	add     a, ra
+059F	40D7	mov     rc, a
+05A0	0FFF	mov     a, FFH
+05A1	5356	adc     a, rb
+05A2	40D8	mov     rd, a
+05A3	4757	mov     a, rc
+05A4	40AB	mov     Output5V[1], a
+05A5	4758	mov     a, rd
+05A6	40AC	mov     Output5V[2], a
+05A7	7FD6	sz      rb.7
+05A8	2DB0	jmp     _L18
+05A9	4755	mov     a, ra
+05AA	4556	or      a, rb
+05AB	3D0A	sz      Z
+05AC	2DB0	jmp     _L18
+				;94				{
+				;95					Out_5V_IO_Open;
+05AD	34A6	clr     PBC1
+05AE	34A5	clr     PB1
+05AF	2DDA	jmp     _L10
+				;96				}
+				;97				else
+				;98				{
+				;99					if(Output5V.OffCnt-- > 0)
+				_L18:
+05B0	472D	mov     a, Output5V[3]
+05B1	40D5	mov     ra, a
+05B2	472E	mov     a, Output5V[4]
+05B3	40D6	mov     rb, a
+05B4	0FFF	mov     a, FFH
+05B5	4355	add     a, ra
+05B6	40D7	mov     rc, a
+05B7	0FFF	mov     a, FFH
+05B8	5356	adc     a, rb
+05B9	40D8	mov     rd, a
+05BA	4757	mov     a, rc
+05BB	40AD	mov     Output5V[3], a
+05BC	4758	mov     a, rd
+05BD	40AE	mov     Output5V[4], a
+05BE	7FD6	sz      rb.7
+05BF	2DC6	jmp     _L20
+05C0	4755	mov     a, ra
+05C1	4556	or      a, rb
+05C2	3D0A	sz      Z
+05C3	2DC6	jmp     _L20
+				;100					{
+				;101						Out_5V_IO_Close;
+05C4	30A6	set     PBC1
+05C5	2DDA	jmp     _L10
+				;102					}
+				;103					else
+				;104					{
+				;105						if(Output5V.Times > 0)
+				_L20:
+05C6	472A	mov     a, Output5V[0]
+05C7	40D5	mov     ra, a
+05C8	7FD5	sz      ra.7
+05C9	2DDA	jmp     _L10
+05CA	50D5	sz      ra
+05CB	2DCD	jmp     _LI6
+05CC	2DDA	jmp     _L10
+				;106						{
+				;107							Output5V.Times--;
+				_LI6:
+05CD	472A	mov     a, Output5V[0]
+05CE	40D5	mov     ra, a
+05CF	55D5	dec     ra
+05D0	4755	mov     a, ra
+05D1	40AA	mov     Output5V[0], a
+				;108							Output5V.OnCnt = OPEN5V_ON_TIME;
+05D2	0F3C	mov     a, 3CH
+05D3	40AB	mov     Output5V[1], a
+05D4	5F2C	clr     Output5V[2]
+				;109							Output5V.OffCnt = OPEN5V_OFF_TIME;
+05D5	0F3C	mov     a, 3CH
+05D6	40AD	mov     Output5V[3], a
+05D7	5F2E	clr     Output5V[4]
+05D8	2DDA	jmp     _L10
+				;110						}				
+				;111					}
+				;112				}		
+				;113			}
+				;114			else
+				;115			{		
+				;116				Out_5V_IO_Close;
+				_L17:
+05D9	30A6	set     PBC1
+				_L10:
+05DA	0003	ret
+				;117			}			
+				;118							
+				;119		}
+				;120	}
+				;file E:\				;1	#include "base.h"
+				;2	#define EXTERN extern
+				;3	#include "Var.h"
+				;4	
+				;5	/****************************************************************/
+				;6	
+				;7	void Run_Operation(void)
+				;8	{
+				;9		static u8 StaFlick;
+				;10		switch(WorkMode)
+				_Run_Operation:
+				_Run_Operation:
+08F4	472F	mov     a, WorkMode[0]
+08F5	40D5	mov     ra, a
+08F6	5F56	clr     rb
+08F7	4755	mov     a, ra
+08F8	4556	or      a, rb
+08F9	3D0A	sz      Z
+08FA	6901	jmp     _L3
+08FB	4755	mov     a, ra
+08FC	0C01	xor     a, 1H
+08FD	4556	or      a, rb
+08FE	3D0A	sz      Z
+08FF	6943	jmp     _L4
+				;11		{
+				;12			case READY_MODE:							// Long_Press  				;13			/**************************************/
+				;14				if((Key_Forward_Long_val_Flag == 1)) 
+				_L3:
+0901	4721	mov     a, maiFlagB[0]
+0902	40D5	mov     ra, a
+0903	0F04	mov     a, 4H
+0904	46D5	andm    a, ra
+0905	50D5	sz      ra
+0906	6908	jmp     _LI1
+0907	6916	jmp     _L5
+				;15				 {
+				;16				 	Key_Forward_Long_val_Flag = 0;
+				_LI1:
+0908	7521	clr     maiFlagB[0].2
+				;17					KeyBuzzer(1);
+0909	0F01	mov     a, 1H
+090A	24FB	call    _KeyBuzzer
+				;18					Power_ON;
+090B	73A0	set     maiFlagA[0].7
+				;19					Open5V();
+090C	24EA	call    _Open5V
+				;20					Open5V200msCnt = 0;
+090D	5F33	clr     Open5V200msCnt[0]
+090E	5F34	clr     Open5V200msCnt[1]
+				;21					NormalWinterFlag = false;			
+090F	7622	clr     LEDG[0].4
+				;22					WorkMode = RUN_MODE;		//0910	0F01	mov     a, 1H
+0911	40AF	mov     WorkMode[0], a
+				;23					PreHeatFlag = true;			//0912	7020	set     maiFlagA[0].0
+				;24					Time1SCnt = 0;				//0913	5F35	clr     Time1SCnt[0]
+				;25				 	_t0on = true;						// turn off timer 0 to change timer config		
+0914	31AF	set     T0ON
+0915	6942	jmp     _L6
+				;26				 }
+				;27				 else 	
+				;28				 {	
+				;29				 	_t0on = false;						// turn off timer 0 to change timer config		
+				_L5:
+0916	35AF	clr     T0ON
+				;30				 	_pa0 = false;
+0917	3414	clr     PA0
+				;31				 	LED_3_BLU_OFF;		 	
+0918	3140	set     PC2
+				;32				 	LED_3_GREEN_OFF;
+0919	30C0	set     PC1
+				;33				 	LED_3_RED_OFF;			 	
+091A	3125	set     PB2
+				;34					LED_WHITE_1_OFF;
+091B	3094	set     PA1
+				;35					LED_WHITE_2_OFF;
+091C	3114	set     PA2
+				;36					if(Close_5V_Flag)					//091D	4721	mov     a, maiFlagB[0]
+091E	40D5	mov     ra, a
+091F	0F20	mov     a, 20H
+0920	46D5	andm    a, ra
+0921	50D5	sz      ra
+0922	6924	jmp     _LI2
+0923	6933	jmp     _L7
+				;37					{
+				;38						Out_5V_IO = 0;					
+				_LI2:
+0924	34A5	clr     PB1
+				;39						if(Open5V200msCnt >= 50)
+0925	4733	mov     a, Open5V200msCnt[0]
+0926	40D5	mov     ra, a
+0927	4734	mov     a, Open5V200msCnt[1]
+0928	40D6	mov     rb, a
+0929	0F31	mov     a, 31H
+092A	4255	sub     a, ra
+092B	0F00	mov     a, 0H
+092C	5256	sbc     a, rb
+092D	3C0A	sz      C
+092E	6933	jmp     _L7
+				;40						{
+				;41							Close_5V_Flag = false;
+092F	76A1	clr     maiFlagB[0].5
+				;42							Open5V200msCnt = 0;
+0930	5F33	clr     Open5V200msCnt[0]
+0931	5F34	clr     Open5V200msCnt[1]
+				;43							Out_5V_IO = 1;
+0932	30A5	set     PB1
+				;44						}
+				;45					}
+				;46					if((SleepCnt >= 5) && (!DCInFlag))	//				_L7:
+0933	4724	mov     a, SleepCnt[0]
+0934	40D5	mov     ra, a
+0935	0F04	mov     a, 4H
+0936	4255	sub     a, ra
+0937	3C0A	sz      C
+0938	6942	jmp     _L6
+0939	4721	mov     a, maiFlagB[0]
+093A	40D5	mov     ra, a
+093B	0F40	mov     a, 40H
+093C	46D5	andm    a, ra
+093D	50D5	sz      ra
+093E	6942	jmp     _L6
+				;47					{
+				;48						SleepCnt = 0;
+093F	5F24	clr     SleepCnt[0]
+				;49						Sleep();
+0940	209C	call    _Sleep
+				;50					}								
+				;51				 }
+				;52				 break;
+0941	69F2	jmp     _L1
+				_L6:
+0942	69F2	jmp     _L1
+				;53			case RUN_MODE:			 
+				;54				if((Key_Forward_Long_val_Flag))		// 				_L4:
+0943	4721	mov     a, maiFlagB[0]
+0944	40D5	mov     ra, a
+0945	0F04	mov     a, 4H
+0946	46D5	andm    a, ra
+0947	50D5	sz      ra
+0948	694A	jmp     _LI3
+0949	6951	jmp     _L9
+				;55				{
+				;56					Key_Forward_Long_val_Flag = 0;
+				_LI3:
+094A	7521	clr     maiFlagB[0].2
+				;57					Power_OFF;
+094B	77A0	clr     maiFlagA[0].7
+				;58					KeyBuzzer(3);
+094C	0F03	mov     a, 3H
+094D	24FB	call    _KeyBuzzer
+				;59					WorkMode = 0;
+094E	5F2F	clr     WorkMode[0]
+				;60					Close5V();
+094F	24F2	call    _Close5V
+				;61					SleepPrepareFlag = true;		//0950	73A1	set     maiFlagB[0].7
+				;62				}
+				;63				if(Double_Click_Value_Flag)  		//				_L9:
+0951	4721	mov     a, maiFlagB[0]
+0952	40D5	mov     ra, a
+0953	0F02	mov     a, 2H
+0954	46D5	andm    a, ra
+0955	50D5	sz      ra
+0956	6958	jmp     _LI4
+0957	696E	jmp     _L10
+				;64				{
+				;65					Double_Click_Value_Flag = 0;
+				_LI4:
+0958	74A1	clr     maiFlagB[0].1
+				;66					KeyBuzzer(2);
+0959	0F02	mov     a, 2H
+095A	24FB	call    _KeyBuzzer
+				;67					NormalWinterFlag = !NormalWinterFlag;
+095B	4722	mov     a, LEDG[0]
+095C	40D5	mov     ra, a
+095D	4755	mov     a, ra
+095E	0E10	and     a, 10H
+095F	40D6	mov     rb, a
+0960	0F01	mov     a, 1H
+0961	40D5	mov     ra, a
+0962	50D6	sz      rb
+0963	6965	jmp     _LI5
+0964	6966	jmp     _L11
+				_LI5:
+0965	5F55	clr     ra
+				_L11:
+0966	0F01	mov     a, 1H
+0967	46D5	andm    a, ra
+0968	5155	swapa   ra
+0969	0EF0	and     a, F0H
+096A	40D5	mov     ra, a
+096B	7622	clr     LEDG[0].4
+096C	4755	mov     a, ra
+096D	45A2	orm     a, LEDG[0]
+				;68				}
+				;69				if(PreHeatFlag)						//				_L10:
+096E	4720	mov     a, maiFlagA[0]
+096F	40D5	mov     ra, a
+0970	0F01	mov     a, 1H
+0971	46D5	andm    a, ra
+0972	50D5	sz      ra
+0973	6975	jmp     _LI6
+0974	69A8	jmp     _L12
+				;70				{
+				;71					if(Task500msFlag)
+				_LI6:
+0975	4723	mov     a, LEDH[0]
+0976	40D5	mov     ra, a
+0977	0F02	mov     a, 2H
+0978	46D5	andm    a, ra
+0979	50D5	sz      ra
+097A	697C	jmp     _LI7
+097B	69E6	jmp     _L19
+				;72					{
+				;73						Task500msFlag = false;
+				_LI7:
+097C	74A3	clr     LEDH[0].1
+				;74						switch(StaFlick)
+097D	4754	mov     a, StaFlick[0]
+097E	40D5	mov     ra, a
+097F	5F56	clr     rb
+0980	4755	mov     a, ra
+0981	4556	or      a, rb
+0982	3D0A	sz      Z
+0983	698F	jmp     _L15
+0984	4755	mov     a, ra
+0985	0C01	xor     a, 1H
+0986	4556	or      a, rb
+0987	3D0A	sz      Z
+0988	6993	jmp     _L16
+0989	4755	mov     a, ra
+098A	0C02	xor     a, 2H
+098B	4556	or      a, rb
+098C	3D0A	sz      Z
+098D	6997	jmp     _L17
+				;75						{
+				;76							case 0:
+				;77								LED_3_GREEN_ON;
+				_L15:
+098F	34C0	clr     PC1
+				;78								LED_3_BLU_OFF;
+0990	3140	set     PC2
+				;79								LED_3_RED_OFF;
+0991	3125	set     PB2
+				;80								break;
+0992	699A	jmp     _L18
+				;81							case 1:
+				;82								LED_3_GREEN_OFF;
+				_L16:
+0993	30C0	set     PC1
+				;83								LED_3_BLU_ON;
+0994	3540	clr     PC2
+				;84								LED_3_RED_OFF;						
+0995	3125	set     PB2
+				;85								break;
+0996	699A	jmp     _L18
+				;86							case 2:
+				;87								LED_3_GREEN_OFF;
+				_L17:
+0997	30C0	set     PC1
+				;88								LED_3_BLU_OFF;
+0998	3140	set     PC2
+				;89								LED_3_RED_ON;
+0999	3525	clr     PB2
+				;90								break;
+				;91							default:
+				;92								break;
+098E	699A	jmp     _L18
+				;93						}
+				;94						if(StaFlick++ >= 2)
+				_L18:
+099A	4754	mov     a, StaFlick[0]
+099B	40D5	mov     ra, a
+099C	4755	mov     a, ra
+099D	40D6	mov     rb, a
+099E	5456	inca    rb
+099F	40D5	mov     ra, a
+09A0	4755	mov     a, ra
+09A1	40D4	mov     StaFlick[0], a
+09A2	0F01	mov     a, 1H
+09A3	4256	sub     a, rb
+09A4	3C0A	sz      C
+09A5	69E6	jmp     _L19
+				;95							StaFlick = 0;
+09A6	5F54	clr     StaFlick[0]
+09A7	69E6	jmp     _L19
+				;96					}
+				;97				}
+				;98				else
+				;99				{				
+				;100					switch(TempSta)
+				_L12:
+09A8	4730	mov     a, TempSta[0]
+09A9	40D5	mov     ra, a
+09AA	5F56	clr     rb
+09AB	4755	mov     a, ra
+09AC	4556	or      a, rb
+09AD	3D0A	sz      Z
+09AE	69BF	jmp     _L21
+09AF	4755	mov     a, ra
+09B0	0C01	xor     a, 1H
+09B1	4556	or      a, rb
+09B2	3D0A	sz      Z
+09B3	69C8	jmp     _L22
+09B4	4755	mov     a, ra
+09B5	0C02	xor     a, 2H
+09B6	4556	or      a, rb
+09B7	3D0A	sz      Z
+09B8	69D6	jmp     _L23
+09B9	4755	mov     a, ra
+09BA	0C03	xor     a, 3H
+09BB	4556	or      a, rb
+09BC	3D0A	sz      Z
+09BD	69DE	jmp     _L24
+				;101					{
+				;102						case DOWN_22:
+				;103							LED_3_BLU_ON;
+				_L21:
+09BF	3540	clr     PC2
+				;104							LED_3_GREEN_OFF;
+09C0	30C0	set     PC1
+				;105							LED_3_RED_OFF;
+09C1	3125	set     PB2
+				;106							Heat_Wire_Duty(2048);   	// 09C2	5F6D	clr     i
+09C3	0F08	mov     a, 8H
+09C4	40EE	mov     min, a
+09C5	21A2	call    _Heat_Wire_Duty
+				;107							MOTOR_OFF;					
+09C6	3694	clr     PA5
+				;108							break;
+09C7	69E6	jmp     _L19
+				;109						case IN_22_37:
+				;110							LED_3_GREEN_ON;
+				_L22:
+09C8	34C0	clr     PC1
+				;111							LED_3_BLU_OFF;
+09C9	3140	set     PC2
+				;112							LED_3_RED_OFF;
+09CA	3125	set     PB2
+				;113							MOTOR_OFF;
+09CB	3694	clr     PA5
+				;114							Heat_Wire_Duty(ntc_val);	// 09CC	4731	mov     a, ntc_val[0]
+09CD	40D5	mov     ra, a
+09CE	4732	mov     a, ntc_val[1]
+09CF	40D6	mov     rb, a
+09D0	4755	mov     a, ra
+09D1	40ED	mov     i, a
+09D2	4756	mov     a, rb
+09D3	40EE	mov     min, a
+09D4	21A2	call    _Heat_Wire_Duty
+				;115							break;
+09D5	69E6	jmp     _L19
+				;116						case IN_37_45:					//				;117							LED_3_GREEN_OFF;
+				_L23:
+09D6	30C0	set     PC1
+				;118							LED_3_BLU_ON;
+09D7	3540	clr     PC2
+				;119							LED_3_RED_ON;
+09D8	3525	clr     PB2
+				;120							Heat_Wire_Duty(0);
+09D9	5F6D	clr     i
+09DA	5F6E	clr     min
+09DB	21A2	call    _Heat_Wire_Duty
+				;121							MOTOR_OFF;
+09DC	3694	clr     PA5
+				;122							break;
+09DD	69E6	jmp     _L19
+				;123						case UP_45:						//				;124							SumOfEdge = 0;
+				_L24:
+09DE	5F36	clr     SumOfEdge[0]
+				;125							LED_3_GREEN_OFF;
+09DF	30C0	set     PC1
+				;126							LED_3_BLU_OFF;
+09E0	3140	set     PC2
+				;127							LED_3_RED_ON;
+09E1	3525	clr     PB2
+				;128							Heat_Wire_Duty(0);
+09E2	5F6D	clr     i
+09E3	5F6E	clr     min
+09E4	21A2	call    _Heat_Wire_Duty
+				;129							MOTOR_ON;
+09E5	3294	set     PA5
+				;130							break;
+				;131						default:
+				;132							break;
+09BE	69E6	jmp     _L19
+				;133					}
+				;134				}
+				;135			/*************************************************************/
+				;136				if(NormalWinterFlag)
+				_L19:
+09E6	4722	mov     a, LEDG[0]
+09E7	40D5	mov     ra, a
+09E8	0F10	mov     a, 10H
+09E9	46D5	andm    a, ra
+09EA	50D5	sz      ra
+09EB	69ED	jmp     _LI8
+09EC	69F0	jmp     _L25
+				;137				{
+				;138					LED_WHITE_1_OFF;
+				_LI8:
+09ED	3094	set     PA1
+				;139					LED_WHITE_2_ON;					
+09EE	3514	clr     PA2
+				;140				}
+				;141				else
+				;142				{			
+				;143					LED_WHITE_1_ON;
+				_L25:
+09F0	3494	clr     PA1
+				;144					LED_WHITE_2_OFF;
+09F1	3114	set     PA2
+				;145				}
+				;146				break;	
+09EF	69F2	jmp     _L1
+				_L1:
+				_L27:
+09F2	0003	ret
+				L09F3:
+09F3	1483	inc     MP1
+				L09F4:
+09F4	3F81	sz      MP0.7
+09F5	69FA	jmp     L09FA
+09F6	0701	mov     a, MP0
+09F7	0084	mov     BP, a
+09F8	0702	mov     a, [02H]
+09F9	0003	ret
+				L09FA:
+09FA	1B01	rrca    MP0
+09FB	0E3F	and     a, 3FH
+09FC	0089	mov     TBHP, a
+09FD	1B03	rrca    MP1
+09FE	0087	mov     TBLP, a
+09FF	1D05	tabrd   ACC
+0A00	3C0A	sz      C
+0A01	0708	mov     a, TBLH
+0A02	0003	ret
+				;147		
+				;148		/***************************************************************************/			
+				;149			default:
+				;150				break;
+0900	69F2	jmp     _L1
+				;151		}
+				;152	}
+				data .SECTION 'DATA'
+				__smod DB DUP (?) ; __smod
+				__lvdc DB DUP (?) ; __lvdc
+				__integ DB DUP (?) ; __integ
+				__intc0 DB DUP (?) ; __intc0
+				__intc1 DB DUP (?) ; __intc1
+				__mfi0 DB DUP (?) ; __mfi0
+				__mfi1 DB DUP (?) ; __mfi1
+				__pa DB DUP (?) ; __pa
+				__pac DB DUP (?) ; __pac
+				__papu DB DUP (?) ; __papu
+				__pawu DB DUP (?) ; __pawu
+				__tmpc DB DUP (?) ; __tmpc
+				__wdtc DB DUP (?) ; __wdtc
+				__lvrc DB DUP (?) ; __lvrc
+				__adrl DB DUP (?) ; __adrl
+				__adrh DB DUP (?) ; __adrh
+				__adcr0 DB DUP (?) ; __adcr0
+				__adcr1 DB DUP (?) ; __adcr1
+				__acerl DB DUP (?) ; __acerl
+				__pb DB DUP (?) ; __pb
+				__pbc DB DUP (?) ; __pbc
+				__pbpu DB DUP (?) ; __pbpu
+				__tm2c0 DB DUP (?) ; __tm2c0
+				__tm2c1 DB DUP (?) ; __tm2c1
+				__tm2al DB DUP (?) ; __tm2al
+				__tm2ah DB DUP (?) ; __tm2ah
+				__tm2rp DB DUP (?) ; __tm2rp
+				__tm0c0 DB DUP (?) ; __tm0c0
+				__tm0c1 DB DUP (?) ; __tm0c1
+				__tm0dl DB DUP (?) ; __tm0dl
+				__tm0dh DB DUP (?) ; __tm0dh
+				__tm0al DB DUP (?) ; __tm0al
+				__tm0ah DB DUP (?) ; __tm0ah
+				__tm0rp DB DUP (?) ; __tm0rp
+				__cpc DB DUP (?) ; __cpc
+				__pc DB DUP (?) ; __pc
+				__pcc DB DUP (?) ; __pcc
+				__pcpu DB DUP (?) ; __pcpu
+				maiFlagA DB DUP (?) ; maiFlagA
+				maiFlagB DB DUP (?) ; maiFlagB
+				LEDG DB DUP (?) ; LEDG
+				LEDH DB DUP (?) ; LEDH
+				SleepCnt DB DUP (?) ; SleepCnt
+				Buzzer DB DUP (?) ; Buzzer
+				Output5V DB DUP (?) ; Output5V
+				WorkMode DB DUP (?) ; WorkMode
+				TempSta DB DUP (?) ; TempSta
+				ntc_val DB 2 DUP (?) ; ntc_val
+				Open5V200msCnt DB 2 DUP (?) ; Open5V200msCnt
+				Time1SCnt DB DUP (?) ; Time1SCnt
+				SumOfEdge DB DUP (?) ; SumOfEdge
+				Time500mSCnt DB DUP (?) ; Time500mSCnt
+				Time_5S_Cnt DB DUP (?) ; Time_5S_Cnt
+				TimeMinCnt DB DUP (?) ; TimeMinCnt
+				PWMCnt DB 2 DUP (?) ; PWMCnt
+				HuxiCnt DB 2 DUP (?) ; HuxiCnt
+				PWMValu DB 2 DUP (?) ; PWMValu
+				Time100uSCnt DB 2 DUP (?) ; Time100uSCnt
+				ChargPlusDly DB 2 DUP (?) ; ChargPlusDly
+				scan_num DB DUP (?) ; scan_num
+				IntCnt DB DUP (?) ; IntCnt
+				LEDSta DB DUP (?) ; LEDSta
+				i DB DUP (?) ; i
+				adcsp DB DUP (?) ; adcsp
+				adcsp_2 DB DUP (?) ; adcsp_2
+				MaxTempIndex DB DUP (?) ; MaxTempIndex
+				k DB 2 DUP (?) ; k
+				k2 DB 2 DUP (?) ; k2
+				Eletricize_Mode DB DUP (?) ; Eletricize_Mode
+				signal_hz_1s DB DUP (?) ; signal_hz_1s
+				StaFlick DB DUP (?) ; StaFlick
+				ra DB DUP (?)
+				rb DB DUP (?)
+				rc DB DUP (?)
+				rd DB DUP (?)
+				ra10 DB DUP (?)
+				rb10 DB DUP (?)
+				rc10 DB DUP (?)
+				rd10 DB DUP (?)
+				r110 DB DUP (?)
+				r210 DB DUP (?)
+				r310 DB DUP (?)
+				r410 DB DUP (?)
+				r510 DB DUP (?)
+				r610 DB DUP (?)
+				r710 DB DUP (?)
+				r10c DB DUP (?)
+				r20c DB DUP (?)
+				r104 DB DUP (?)
+				r204 DB DUP (?)
+				r304 DB DUP (?)
+				r404 DB DUP (?)
+				r504 DB DUP (?)
+				ra04 DB DUP (?)
+				rb04 DB DUP (?)
+				i DB DUP (?) ; i
+				min DB 2 DUP (?) ; min
+				j DB 2 DUP (?) ; j
+				max DB 2 DUP (?) ; max
+				adcBuf DB DUP (?) ; adcBuf
+				Time4mSCnt DB DUP (?) ; Time4mSCnt
+				Time1SClearCnt DB DUP (?) ; Time1SClearCnt
+				Forward_Buf DB DUP (?) ; Forward_Buf
+				Pre_Forward_Buf DB DUP (?) ; Pre_Forward_Buf
+				Key_Forward_Time DB DUP (?) ; Key_Forward_Time
+				Key_Forward_Delay DB 2 DUP (?) ; Key_Forward_Delay
+				Key_Forward_Ms DB 2 DUP (?) ; Key_Forward_Ms
+				Double_Click_timer DB 2 DUP (?) ; Double_Click_timer
+				Change_Key_Mode DB DUP (?) ; Change_Key_Mode
+				adcBuf DB DUP (?) ; adcBuf
