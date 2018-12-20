@@ -59,7 +59,6 @@ void TaskBuzzer(void)
 			if(Buzzer.OnCnt-- > 0)
 			{
 				Buzz_ON;
-				//LED_3_GREEN_REVERSE;
 			}
 			else
 			{
@@ -81,11 +80,6 @@ void TaskBuzzer(void)
 		else
 		{		
 			Buzz_OFF;
-			if(SleepPrepareFlag)
-			{
-				SleepPrepareFlag = false;
-				SleepModeFlag = true;
-			}
 		}
 		
 		if(Output5V.Times > 0)	//5vÊä³ö

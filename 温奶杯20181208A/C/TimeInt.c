@@ -3,28 +3,22 @@
 #include "Var.h"
 
 #define INIT_NO_DETECT_TIME	3
-volatile static unsigned char Time4mSCnt __attribute__ ((at(0x1d5)));
-//volatile static unsigned char Time1SCnt __attribute__ ((at(0x1d6)));
 volatile static unsigned char Time1SClearCnt __attribute__ ((at(0x1d7)));
-volatile static unsigned char Time_3S_Cnt __attribute__ ((at(0x1d8)));
-volatile static unsigned char Time_10Min_Cnt __attribute__ ((at(0x1d9)));
-volatile static unsigned char Time_30Min_Cnt __attribute__ ((at(0x1da)));
 
-unsigned char Time500mSCnt = 0;
-unsigned char Time_5S_Cnt = 0;
-unsigned char TimeMinCnt = 0;
+unsigned char Time500mSCnt = 0,Time4mSCnt = 0;
 
 /********************************************************/
 volatile unsigned int PWMCnt = 0;
 volatile unsigned int HuxiCnt = 0;
 volatile unsigned int PWMValu = 10;
 
-#define HUXI_VAL 1300
+#define HUXI_VAL 		1600
+#define PWM_CYCLE		12
 
 /***************** 呼吸灯 **********************************************/
 void LED_Breathe(void)
 {
-	if((Breathe_Flag == 1))
+	if((Breathe_Flag == 1) && (BatSta != BATTRY_FULL))
 	{
 	    PWMCnt++;
 	    HuxiCnt++;
@@ -32,7 +26,7 @@ void LED_Breathe(void)
 	    {
 	        LED_Breathe_ON;       	//点亮LED
 	    }
-	    if(PWMCnt == 10)             //当前周期结束
+	    if(PWMCnt == PWM_CYCLE)   	//当前周期结束
 	    {
 	        LED_Breathe_OFF;      	//熄灭LED
 	        PWMCnt = 0;              //重新计时
@@ -41,7 +35,7 @@ void LED_Breathe(void)
 	    {                               //占空比增加10%
 	        HuxiCnt = 0;
 	        PWMValu++;
-	        if(PWMValu == 10)          //占空比更改方向
+	        if(PWMValu == PWM_CYCLE)  	//占空比更改方向
 	            direc_flag = 1; 
 	    }
  	    if((HuxiCnt == HUXI_VAL) && (direc_flag == 1))
@@ -51,23 +45,19 @@ void LED_Breathe(void)
 	        if(PWMValu == 1)          //占空比更改方向
 	            direc_flag = 0; 
 	    } 	
-	}
-	else 
-	{
-		LED_Breathe_OFF;
 	}	
 }
 
 /*****************************************************************/
 extern unsigned int ntc_val;		
 //值越小，底电平时间越小，高电平时间越长，MOS导通越长
-void Heat_Wire_Duty(u16 step_15)
+void HeatCtrDuty(u16 step_15)
 {	
 	_tm0al = ((step_15&0xff));
 	_tm0ah = ((step_15>>8));	
 }
 /*********************************************************/
-void Timer_Init(void)
+void TimerInit(void)
 {               
 //time0 PWM
 	_wdtc = 0xA8;  	
@@ -119,7 +109,6 @@ void Timer_Init(void)
 ********************************************************************************************************/
 u16 Time100uSCnt = 0;
 u16 ChargPlusDly = 0;
-u8 LEDSta[4];
 /**********************************************************
 
  * 名称: void Led2Disp_Scan(void)
@@ -129,51 +118,65 @@ u8 LEDSta[4];
  * 说明: 无
  **********************************************************/
 unsigned char scan_num = 0;//扫描状态变量
-u8 IntCnt = 0;
 void LEDDispKeyScan(void)
 {
 	scan_num++;	
-
 	switch(scan_num)	
 	{
 		case 1://状态1扫描LED灯
-			if(LEDSta[0] == 1)
+			if(LEDSta[0] == 1)	//红
 			{
-				COM3_INPUT;
+				COM2_ON;
+				COM3_ON;
 				COM1_OFF;
-				COM2_ON;				
-				COM1_OUTPUT;
-				COM2_OUTPUT;
+			}
+			else				//一定要有关的操作，不然会出现闪烁
+			{
+				COM2_OFF;
+				COM3_OFF;
+				COM1_OFF;				
 			}
 			break;
 		case 2:
-			if(LEDSta[1] == 1)
+			if(LEDSta[1] == 1)	//蓝
 			{				
-				COM3_INPUT;
 				COM1_ON;
 				COM2_OFF;
-				COM1_OUTPUT;
-				COM2_OUTPUT;
+				COM3_OFF;
+			}
+			else
+			{
+				COM2_OFF;
+				COM3_OFF;
+				COM1_OFF;				
 			}
 			break;
 		case 3:	
-			if(LEDSta[2] == 1)
+			if(LEDSta[2] == 1)	//白
 			{
-				COM1_INPUT;
+				COM1_ON;
 				COM2_ON;
 				COM3_OFF;
-				COM2_OUTPUT;
-				COM3_OUTPUT;
+			}
+			else
+			{
+				COM2_OFF;
+				COM3_OFF;
+				COM1_OFF;				
 			}
 			break;
       	case 4:
-			if(LEDSta[3] == 1)
+			if(LEDSta[3] == 1)	//绿
 			{
-				COM1_INPUT;
-				COM2_OFF;
 				COM3_ON;
-				COM2_OUTPUT;
-				COM3_OUTPUT;
+				COM1_OFF;
+				COM2_OFF;
+			}
+			else
+			{
+				COM2_OFF;
+				COM3_OFF;
+				COM1_OFF;				
 			}
  			scan_num = 0;
 	      	break;
@@ -184,33 +187,47 @@ void LEDDispKeyScan(void)
 
 #define CNT_4MS		40 	//4ms
 #define CNT_1S		250	//1s
-#define PRE_HEAT	10
 void __attribute((interrupt(0x10))) ISR_tmr2 (void)
 {
-	static u8 i =0;
+//	static u8 i =0;
+//	u8 j = 0;
 	_t2af = 0;
 	Time100uSCnt++;	
-	LED_Breathe();		//呼吸灯
-	if(Time100uSCnt >= CNT_4MS)	//4ms
+	LED_Breathe();						//呼吸灯
+	if(Time100uSCnt >= CNT_4MS)			//4ms
 	{
 		Time100uSCnt = 0;
-		TaskBuzzerRdy  = true;
-		ChargPlusDly++;
+		LEDDispKeyScan();				//4ms扫描灯
 		Time4mSCnt++;
+		if((Time4mSCnt&0x03) == 0x03)	//12ms周期
+		{
+			TaskBatRdyFlag = true;			
+		}
+		TaskBuzzerRdy  = true;
+		TaskADRdyFlag = true;
+		ChargPlusDly++;
 		if((Time4mSCnt & 0x02) == 0x02)	//按键8MS周期扫描
 			TaskKeyRdy = true;
-		LEDDispKeyScan();
 		Open5V200msCnt++;
 		Time500mSCnt++;		
 		if(Time4mSCnt >= CNT_1S)		//1s
 		{
 			Time4mSCnt = 0;
 			Time1SCnt++;
+			Sys1SCnt++;
 			Time1SClearCnt++;
 			SumOfEdge++;
 			if(WorkMode == READY_MODE)	//待机模式下
 			{
-				SleepCnt++;
+				SleepCnt++;				
+			}
+			if((Sys1SCnt % 5) == 0)
+			{
+				Task5SFlag = true;
+			}
+			if(BATLow3p5Flag)			//底电压状态下关机延时
+			{
+				LowBatShutDnSCnt++;
 			}
 		}
 		if(Time500mSCnt >= 125)			//500ms
@@ -222,17 +239,22 @@ void __attribute((interrupt(0x10))) ISR_tmr2 (void)
 		{
 			Time1SClearCnt = 0;
 			IntCnt = 0;
-			DCInFlag = false;
+			ChargIngFlag = false;
 		}
-		if(Time1SCnt >= PRE_HEAT)		//1min
+		if(Sys1SCnt >= 60)
 		{
-			if(PreHeatFlag)	
-				PreHeatFlag = false;
-			TimeMinCnt++;
+			Sys1SCnt = 0;
+			if(BATUp4p1Flag)					//4.1V以上计时生效
+			{
+				BATChargeFullCnt++;
+				if(BATChargeFullCnt >= CHARG_FULL_TIME)
+				{
+					ChargeFullFlag = true;		//充饱
+				}
+			}
 		}			
 	} 	
 }
-
 /*********************************************************************************************************/
 
 void __attribute((interrupt(0x0c))) ISR_tmr0 (void)
@@ -256,9 +278,11 @@ void __attribute((interrupt(0x04))) ISR_int0 (void)
 	if((ChargPlusDly > 170 ) && (ChargPlusDly < 350))	//检测到底电平,暂时不清楚中心值在哪里 1100ms好像
 	{		
 		if(IntCnt++ >= 2)								//2次检测有效，否则容易出现开关机时的底电平误检测
-			DCInFlag = true;
+		{
+			ChargIngFlag = true;						//正在充电中
+		}
 		Time1SClearCnt = 0;								//清除无DC插入计时
 	}
-	SleepCnt = 0;										//防止拨掉DC后残留脉冲导致一会醒一会睡的情况
+	SleepCnt = 0;										//防止拨掉DC后残留脉冲导致一会醒一会睡的情况，清除睡眠计时
 	ChargPlusDly = 0;
 }

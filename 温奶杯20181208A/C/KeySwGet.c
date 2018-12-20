@@ -19,18 +19,11 @@ volatile static unsigned int Key_LongPre_timer __attribute__ ((at(0x1e8)));
 /**********************************/
 extern unsigned char Key_ms;
 
-extern unsigned char Time_500MS_Cnt;
-extern unsigned char Time_1S_Cnt;
-extern u8 Duty_percentage;
-extern unsigned int PWM_VLAUE;
-extern volatile unsigned int Time_200MS_Cnt;
-
-extern u8 signal_hz_1s;
 /*******************************/
 #define KEY_LONG	150
 #define MAX_EFFECT_TIME	200	//2S
 /********* °´¼üÉ¨Ãè ********************************/
-void GetKey(void)
+void TaskKey(void)
 {
 	if(TaskKeyRdy)
 	{

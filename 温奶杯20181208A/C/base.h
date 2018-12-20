@@ -5,8 +5,6 @@
 
 #define u8 unsigned char
 #define u16 unsigned int
-
-
 //***************************************************//
 typedef unsigned char 	uchar; 				//8bit
 typedef unsigned int	uint16; 			//16bit
@@ -17,64 +15,41 @@ typedef unsigned long 	uint32; 			//32bit
 #define true	1
 #define false	0
 
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#define LED_ON	1
+#define LED_OFF	0
+
 #define DEBUG_SWITCH
 #define DEBUG_HOT_ON
 #define DEBUG_TX
 
-#define COM1 _pc0
-#define COM2 _pa2
-#define COM3 _pa7
+#define COM1 _pc1
+#define COM2 _pc2
+#define COM3 _pa1
 
-
-#define COM1_ON		COM1 = true
-#define COM1_OFF	COM1 = false
-#define COM1_INPUT  _pcc0 = true;_pcpu0 = false;
-#define COM1_OUTPUT  _pcc0 = false;_pcpu0 = true;
+#define COM1_ON			COM1 = true
+#define COM1_OFF		COM1 = false
+#define COM1_INPUT  	_pcc1 = true;_pcpu1 = false;
+#define COM1_OUTPUT  	_pcc1 = false;_pcpu1 = true;
 	
-#define COM2_ON		COM2 = true
-#define COM2_OFF	COM2 = false
-#define COM2_INPUT	_pac2 = true;_papu2 = false;
-#define COM2_OUTPUT  _pac2 = false;_papu2 = true;
+#define COM2_ON			COM2 = true
+#define COM2_OFF		COM2 = false
+#define COM2_INPUT		_pcc2 = true;_pcpu2 = false;
+#define COM2_OUTPUT  	_pcc2 = false;_pcpu2 = true;
 
-#define COM3_ON		COM3 = true
-#define COM3_OFF	COM3 = false
-#define COM3_INPUT	_pac7 = true;_papu7 = false;
-#define COM3_OUTPUT  _pac7 = false;_papu7 = true;
+#define COM3_ON			COM3 = true
+#define COM3_OFF		COM3 = false
+#define COM3_INPUT		_pac1 = true;_papu1 = false;
+#define COM3_OUTPUT  	_pac1 = false;_papu1 = true;
 
-
-//~~~IO~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-#define LED_WHITE_1			_pa1	// 白色灯—LED_3
-#define LED_WHITE_1_ON		LED_WHITE_1 = false
-#define LED_WHITE_1_OFF		LED_WHITE_1 = true
-#define LED_WHITE_1_REVERSE	LED_WHITE_1 = !LED_WHITE_1
-
-#define LED_WHITE_2			_pa2	// 白色灯—LED_4
-#define LED_WHITE_2_ON		LED_WHITE_2 = false
-#define LED_WHITE_2_OFF		LED_WHITE_2 = true
-#define LED_WHITE_2_REVERSE	LED_WHITE_2 = !LED_WHITE_2
+#define LED_WHITE_2				_pa2	// 白色灯—LED_4
+#define LED_WHITE_2_ON			LED_WHITE_2 = false
+#define LED_WHITE_2_OFF			LED_WHITE_2 = true
+#define LED_WHITE_2_REVERSE		LED_WHITE_2 = !LED_WHITE_2
 
 #define Buzz					_pc0	// 蜂鸣器
 #define Buzz_ON					Buzz = true
 #define Buzz_OFF				Buzz = false
 #define Buzz_REVERSE			Buzz = !Buzz
-
-#define LED_3_BLU			_pc2	// 三色灯  蓝
-#define LED_3_BLU_ON		LED_3_BLU = false
-#define LED_3_BLU_OFF		LED_3_BLU = true
-#define LED_3_BLU_REVERSE	LED_3_BLU = !LED_3_BLU
-		
-#define LED_3_GREEN			_pc1	// 三色灯  绿
-#define LED_3_GREEN_ON		LED_3_GREEN = false
-#define LED_3_GREEN_OFF		LED_3_GREEN = true
-#define LED_3_GREEN_REVERSE	LED_3_GREEN = !LED_3_GREEN
-
-#define LED_3_RED			_pb2	// 三色灯  红
-#define LED_3_RED_ON		LED_3_RED = false
-#define LED_3_RED_OFF		LED_3_RED = true
-#define LED_3_RED_REVERSE	LED_3_RED = !LED_3_RED
-
 
 #define LED_Breathe_light    _pa7	// 呼吸灯
 #define LED_Breathe_ON     LED_Breathe_light = false
@@ -82,9 +57,6 @@ typedef unsigned long 	uint32; 			//32bit
 #define LED_Breathe_light_REVERSE	LED_Breathe_light = !LED_Breathe_light
 #define KEY		_pa3	//按键
 		
-/************************************************/
-#define Power_ON		Power_ON_OFF_flag = 1
-#define Power_OFF		Power_ON_OFF_flag = 0
 /************************************************/
 #define MOTOR			_pa5		
 #define MOTOR_ON		MOTOR = true
@@ -101,20 +73,6 @@ typedef unsigned long 	uint32; 			//32bit
 /************************************************/
 #define Bat_Status			_pb0
 
-
-/************************************************/
-//#define CONFIG_IN_NUM	0x01
-//#define KEY_MODE		0
-//
-//#define LONG_KEY       	10
-
-//#define PWM_MAX         8000
-//#define PWM_MIN         2048
-//#define PWM_MID         5200
-//#define AdjA        22  //22  //55 //65     //5  20
-//#define AdjB        27 // 28  //75 //75    //3  16
-//#define AdjC        8  // 8   //25 //15      //0  2
-
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #define STAR_ADC()    {_start=0; _start=1; _start=0;}
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -129,10 +87,6 @@ typedef struct {
 	unsigned char b7 : 1;
 } _t_bits;
 
-/***************************************************/
-
-/**************************************************/
-
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~~~~main.c~~~~~~~~~~~~~~~~~~~~
 extern _t_bits maiFlagA;
@@ -143,7 +97,7 @@ extern _t_bits maiFlagA;
 #define Key_Forward_Long_val	maiFlagA.b4
 #define Change_Key_flag			maiFlagA.b5
 #define direc_flag				maiFlagA.b6			// Tim_PWM
-#define Power_ON_OFF_flag		maiFlagA.b7			// Tim_PWM
+#define TempDirDnFlag			maiFlagA.b7			// Tim_PWM
 
 
 extern _t_bits maiFlagB;
@@ -152,45 +106,38 @@ extern _t_bits maiFlagB;
 #define	Key_Forward_Long_val_Flag	maiFlagB.b2
 #define SleepModeFlag				maiFlagB.b3 
 #define Open_5V_Flag				maiFlagB.b4
-#define Close_5V_Flag				maiFlagB.b5
-#define DCInFlag					maiFlagB.b6
-#define SleepPrepareFlag      		maiFlagB.b7
+#define TaskADRdyFlag				maiFlagB.b5
+#define ChargIngFlag				maiFlagB.b6
+#define TaskBatRdyFlag      		maiFlagB.b7
 
-#define ADC_NTC        			0x13	   // NTC值
-#define ADC_BATTERY        		0x15	   // Battery_dat
+#define ADC_NTC        			0x12	   	//红外温度测试值
+#define ADC_AROUD        		0x13	   	//室温电阻测试值
+#define ADC_BAT					0x15		//电池分压测试值
 extern _t_bits LEDG;
 #define Breathe_Flag	  		LEDG.b0
-#define Power_Low_33V_Flag	  	LEDG.b1
-#define Power_42V_Flag	  		LEDG.b2
-
+#define BATLow3p5Flag		  	LEDG.b1
+#define BATUp4p1Flag	  		LEDG.b2
 #define TaskBuzzerRdy       	LEDG.b3
 #define NormalWinterFlag		LEDG.b4
 #define TaskKeyRdy	 			LEDG.b5
-#define LED_direc 				EDG.b6
-#define Opend_5V_flag 			LEDG.b7
+#define LED_direc 				LEDG.b6
+#define TempDir		 			LEDG.b7		//温度上升或者下降
 
 
 
-#define H_45C_Flag     LEDH.b0
-#define Task500msFlag      LEDH.b1
-#define Bat_Power_Zero_flag      LEDH.b2
-#define Bat_Power__flag      LEDH.b3
+#define ChargeFullFlag 			LEDH.b0
+#define Task500msFlag      		LEDH.b1
+#define Task5SFlag		     	LEDH.b2
 
 #define Pull_One 		200
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 extern void InitSys(void);
-extern void Ram_Init(void);
-extern void Timer_Init(void);
-extern void GetKey(void);
 extern void Run_Operation(void);
 extern void LED_Breathe(void);
 extern void KeyBuzzer(char Buzz_1);
-extern void Buzz_Runing_1ms_Int(void);
 extern void GetPTCValu();
 extern void Get_Battery_Valu(void);
 extern void Sleep_Mode(void);
-extern void Battery_Status_Operation(void);
-extern void Heat_Wire_Duty(u16 step_15);
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #endif //__SS350_BASE
